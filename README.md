@@ -1,5 +1,5 @@
-# UIED - UI element detection, detecting UI elements from UI screenshots or drawnings
-https://github.com/MulongXie/UIED
+# uied物体検出プロジェクト
+https://github.com/MulongXie/UIED  
 [こちら](https://github.com/MulongXie/UIED)を参考に開発
 
 ## インストール
