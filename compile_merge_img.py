@@ -128,7 +128,7 @@ for i in range(element_num):
                 img_width = jon_dat["compos"][div_list_idx]["width"]
                 img_height = jon_dat["compos"][div_list_idx]["height"]
                 #　分割数
-                d_num = 6
+                d_num = 5
                 d_x = int(img_width / d_num)
                 d_y = int(img_height / d_num)
                 # 抽出ポジション初期値
@@ -169,11 +169,14 @@ for i in range(element_num):
                 img_colors = []
                 img_dict = {}
                 img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
+                #　分割数
+                d_num = 10
+                d_x = int(img_width / d_num)
+                d_y = int(img_height / d_num)
 
                 # グレースケールに変換
-#                img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 # 閾値の設定
-                threshold = 150
+                threshold = 80
                 # 二値化(閾値100を超えた画素を255にする。)
                 ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
 
@@ -183,9 +186,9 @@ for i in range(element_num):
 
                     for ky in range(d_num-1):
                         pos = (y_col, x_col)
-                        print(img_thresh[pos])
+                        #print(img_thresh[pos])
                         #img_list = list(img_thresh[pos])
-                        print(img_list)
+                        #print(img_list)
                         img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_thresh[pos])}}
                         img_colors.append(str(img_thresh[pos]))
 #                        img_colors.append(str(img_thresh[pos]).zfill(3))
@@ -195,21 +198,25 @@ for i in range(element_num):
                     y_col = init_y_col
 
                 c = collections.Counter(img_colors)
+                print(c)
                 if len(c) > 1:
-                    second_color = c.most_common()[1]
+                    #二値化後も2色（白黒）だったとき
+                    second_color = c.most_common()[1][0]
                 else:
-                    second_color = c.most_common()[0]
+                    #二値化の結果、一色だけになったとき
+                    second_color = c.most_common()[0][0]
 
 #                s_color = [int(second_color[:3]), int(second_color[3:6]), int(second_color[6:])]
                 print("second_color = " + str(second_color))
 
                 color = m_color
-
+                print(jon_dat["compos"][div_list_idx]["class"])
                 if jon_dat["compos"][div_list_idx]["class"] == "Text":
-                    if second_color == 255:
+                    if second_color == "255":
                         txt_color = "white"
                     else:
                         txt_color = "black"
+                    print("Text")
                 else:
                     txt_color = "black"
                 # もっとも単純な色抽出
@@ -238,6 +245,7 @@ for i in range(element_num):
                     f2.writelines(color_str)
 #                    txt_color_str = "background: #" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
                     #txt_color_str = "#" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
+                    print("text_colot = " + txt_color)
                     f2.writelines("color: " + txt_color + ";\n")
 #                    f2.writelines("color: black;\n")
                     f2.writelines("font-size: " + str(int(int(s_height)*0.76)) + "px;\n")
@@ -251,7 +259,7 @@ for i in range(element_num):
         #pre_row_max = jon_dat["compos"][i]["position"]["row_min"]
         # リストをリセット
         div_list = []
-        print("Next div")
+#        print("Next div")
     # div 同じ段
     else:
         # リストに追加
