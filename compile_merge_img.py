@@ -132,8 +132,6 @@ for i in range(element_num):
                 d_x = int(img_width / d_num)
                 d_y = int(img_height / d_num)
                 # 抽出ポジション初期値
-                #init_x_col = int(d_x / 2)
-                #init_y_col = int(d_y / 2)
                 init_x_col = int(d_x / 2 + jon_dat["compos"][div_list_idx]["position"]["column_min"])
                 init_y_col = int(d_y / 2 + jon_dat["compos"][div_list_idx]["position"]["row_min"])
                 x_col = init_x_col
@@ -163,66 +161,65 @@ for i in range(element_num):
                 m_color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
                 print("color = " + str(color))
 
-
-                # その領域で2番目に多い色を探す
-                # まず、二値化　-> 2番目に多い色を探す。それを文字の色にする
-                img_colors = []
-                img_dict = {}
-                img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
-                #　分割数
-                d_num = 10
-                d_x = int(img_width / d_num)
-                d_y = int(img_height / d_num)
-
-                # グレースケールに変換
-                # 閾値の設定
-                threshold = 80
-                # 二値化(閾値100を超えた画素を255にする。)
-                ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
-
-                x_col = init_x_col
-                y_col = init_y_col
-                for kx in range(d_num-1):
-
-                    for ky in range(d_num-1):
-                        pos = (y_col, x_col)
-                        #print(img_thresh[pos])
-                        #img_list = list(img_thresh[pos])
-                        #print(img_list)
-                        img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_thresh[pos])}}
-                        img_colors.append(str(img_thresh[pos]))
-#                        img_colors.append(str(img_thresh[pos]).zfill(3))
-                        y_col = y_col + d_y
-
-                    x_col = x_col + d_x
-                    y_col = init_y_col
-
-                c = collections.Counter(img_colors)
-                print(c)
-                if len(c) > 1:
-                    #二値化後も2色（白黒）だったとき
-                    second_color = c.most_common()[1][0]
-                else:
-                    #二値化の結果、一色だけになったとき
-                    second_color = c.most_common()[0][0]
-
-#                s_color = [int(second_color[:3]), int(second_color[3:6]), int(second_color[6:])]
-                print("second_color = " + str(second_color))
-
-                color = m_color
+                # 領域が文字だった時、文字の色を抽出する。
                 print(jon_dat["compos"][div_list_idx]["class"])
                 if jon_dat["compos"][div_list_idx]["class"] == "Text":
+                    # その領域で2番目に多い色を探す
+                    # まず、二値化　-> 2番目に多い色を探す。それを文字の色にする
+                    img_colors = []
+                    img_dict = {}
+                    img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
+                    #　分割数
+                    d_num = 10
+                    d_x = int(img_width / d_num)
+                    d_y = int(img_height / d_num)
+
+                    # グレースケールに変換
+                    # 閾値の設定
+                    threshold = 80
+                    # 二値化(閾値100を超えた画素を255にする。)
+                    ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
+
+                    x_col = init_x_col
+                    y_col = init_y_col
+                    for kx in range(d_num-1):
+
+                        for ky in range(d_num-1):
+                            pos = (y_col, x_col)
+                            img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_thresh[pos])}}
+                            img_colors.append(str(img_thresh[pos]))
+                            y_col = y_col + d_y
+
+                        x_col = x_col + d_x
+                        y_col = init_y_col
+
+                    c = collections.Counter(img_colors)
+                    print(c)
+                    if len(c) > 1:
+                        #二値化後も2色（白黒）だったとき
+                        second_color = c.most_common()[1][0]
+                    else:
+                        #二値化の結果、一色だけになったとき
+                        second_color = c.most_common()[0][0]
+
+                    print("second_color = " + str(second_color))
+
                     if second_color == "255":
                         txt_color = "white"
                     else:
                         txt_color = "black"
                     print("Text")
+
+                # 領域が文字以外の時
                 else:
                     txt_color = "black"
+
                 # もっとも単純な色抽出
 #                pos = (y_c, x_c)
 #                img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
 #                color = list(img[pos])
+
+                color = m_color
 
                 # CSS make and save
                 s_width = str(jon_dat["compos"][div_list_idx]["width"])
