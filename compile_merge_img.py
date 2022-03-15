@@ -128,7 +128,7 @@ for i in range(element_num):
                 img_width = jon_dat["compos"][div_list_idx]["width"]
                 img_height = jon_dat["compos"][div_list_idx]["height"]
                 #　分割数
-                d_num = 6 
+                d_num = 6
                 d_x = int(img_width / d_num)
                 d_y = int(img_height / d_num)
                 # 抽出ポジション初期値
@@ -139,6 +139,7 @@ for i in range(element_num):
                 x_col = init_x_col
                 y_col = init_y_col
 
+                # その領域で最も多い色を見つけて、それをその領域の色とする。
                 img_colors = []
                 img_dict = {}
                 for kx in range(d_num-1):
@@ -155,12 +156,62 @@ for i in range(element_num):
                     y_col = init_y_col
 
                 import collections
-                print(img_colors)
+                #print(img_colors)
                 c = collections.Counter(img_colors)
+                # その領域で最も多い色
                 most_color = c.most_common()[0][0]
-                color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
-                print(color)
+                m_color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
+                print("color = " + str(color))
 
+
+                # その領域で2番目に多い色を探す
+                # まず、二値化　-> 2番目に多い色を探す。それを文字の色にする
+                img_colors = []
+                img_dict = {}
+                img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
+
+                # グレースケールに変換
+#                img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                # 閾値の設定
+                threshold = 150
+                # 二値化(閾値100を超えた画素を255にする。)
+                ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
+
+                x_col = init_x_col
+                y_col = init_y_col
+                for kx in range(d_num-1):
+
+                    for ky in range(d_num-1):
+                        pos = (y_col, x_col)
+                        print(img_thresh[pos])
+                        #img_list = list(img_thresh[pos])
+                        print(img_list)
+                        img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_thresh[pos])}}
+                        img_colors.append(str(img_thresh[pos]))
+#                        img_colors.append(str(img_thresh[pos]).zfill(3))
+                        y_col = y_col + d_y
+
+                    x_col = x_col + d_x
+                    y_col = init_y_col
+
+                c = collections.Counter(img_colors)
+                if len(c) > 1:
+                    second_color = c.most_common()[1]
+                else:
+                    second_color = c.most_common()[0]
+
+#                s_color = [int(second_color[:3]), int(second_color[3:6]), int(second_color[6:])]
+                print("second_color = " + str(second_color))
+
+                color = m_color
+
+                if jon_dat["compos"][div_list_idx]["class"] == "Text":
+                    if second_color == 255:
+                        txt_color = "white"
+                    else:
+                        txt_color = "black"
+                else:
+                    txt_color = "black"
                 # もっとも単純な色抽出
 #                pos = (y_c, x_c)
 #                img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
@@ -182,11 +233,13 @@ for i in range(element_num):
                     f2.writelines("left:" + s_left + "px;\n" )
                     f2.writelines("width:" + s_width + "px;\n" )
                     f2.writelines("height:" + s_height + "px;\n" )
-                    color_str = "background: #" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2) + ";\n"
                     color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
 #                    color_str = "background: rgba(" + format(color[2], 'o').zfill(3) + ","  + format(color[1], 'o').zfill(3) + "," + format(color[0], 'o').zfill(3) + ", 0.55 );\n"
                     f2.writelines(color_str)
-                    f2.writelines("color: black;\n")
+#                    txt_color_str = "background: #" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
+                    #txt_color_str = "#" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
+                    f2.writelines("color: " + txt_color + ";\n")
+#                    f2.writelines("color: black;\n")
                     f2.writelines("font-size: " + str(int(int(s_height)*0.76)) + "px;\n")
                     f2.writelines("z-index: " + str(z_index) + ";\n")
                     f2.writelines("}\n\n")
