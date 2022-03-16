@@ -121,10 +121,10 @@ for i in range(element_num):
                 f3.writelines('</div>\n')
 
                 # 色の抽出
-                # 色の抽出は図形の中心ではなく、端っこにした。
-                x_c = x_left + 2
-                y_c = y_top + 2
-                # 色の抽出は図形の中心ではなく、端っこにした。
+                # 色の抽出は図形の中心ではなく、端っこにした場合。初期のころに使ったが、実際は使わず。
+                #x_col = x_left + 2
+                #y_col = y_top + 2
+                # 色の抽出は図形のマトリックス状のドット位置の色を抽出。最も多い点数の色を背景色とする。
                 img_width = jon_dat["compos"][div_list_idx]["width"]
                 img_height = jon_dat["compos"][div_list_idx]["height"]
                 #　分割数
