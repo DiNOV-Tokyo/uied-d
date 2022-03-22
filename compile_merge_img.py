@@ -92,31 +92,24 @@ for i in range(element_num):
             f3.writelines('<div class="pbox">\n')
             for div_list_idx in div_list:
                 print(div_list_idx)
-                # 色の検出
-                # 図形の中心を計算
-                x_c = int((int(jon_dat["compos"][div_list_idx]["position"]["column_max"]) + int(jon_dat["compos"][div_list_idx]["position"]["column_min"])) / 2 )
-                y_c = int((int(jon_dat["compos"][div_list_idx]["position"]["row_max"]) + int(jon_dat["compos"][div_list_idx]["position"]["row_min"])) / 2 ) 
+
                 x_left = int(jon_dat["compos"][div_list_idx]["position"]["column_min"])
                 y_top = int(jon_dat["compos"][div_list_idx]["position"]["row_min"])
 
+                # Textを最上部に表示する。
                 # 現状では、画像は、SeekBar で検出される。SeekBarのとき、画像を表示するようにする。
-                if jon_dat["compos"][div_list_idx]["class"] == "SeekBar":
-                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
-                    f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
-                    z_index = 100
-                elif jon_dat["compos"][div_list_idx]["class"] == "Spinner":
-                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
-                    f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
-                    z_index = 80
-                else:
-#                    f3.writelines('<div class="square' + str(div_list_idx) + '" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
-                    f3.writelines('<div class="square' + str(div_list_idx) + '" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
-                    z_index = 10
-
-
                 if jon_dat["compos"][div_list_idx]["class"] == "Text":
                     f3.writelines(jon_dat["compos"][div_list_idx]["text_content"] + '\n')
                     z_index = 200
+                elif jon_dat["compos"][div_list_idx]["class"] == "SeekBar":
+                    f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
+                    z_index = 100
+                elif jon_dat["compos"][div_list_idx]["class"] == "Spinner":
+                    f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
+                    z_index = 80
+                else:
+                    f3.writelines('<div class="square' + str(div_list_idx) + '" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
+                    z_index = 10
 
                 f3.writelines('</div>\n')
 
@@ -125,10 +118,14 @@ for i in range(element_num):
                 #x_col = x_left + 2
                 #y_col = y_top + 2
                 # 色の抽出は図形のマトリックス状のドット位置の色を抽出。最も多い点数の色を背景色とする。
+                # 色の検出
+                # 図形の中心を計算
+                x_c = int((int(jon_dat["compos"][div_list_idx]["position"]["column_max"]) + int(jon_dat["compos"][div_list_idx]["position"]["column_min"])) / 2 )
+                y_c = int((int(jon_dat["compos"][div_list_idx]["position"]["row_max"]) + int(jon_dat["compos"][div_list_idx]["position"]["row_min"])) / 2 ) 
                 img_width = jon_dat["compos"][div_list_idx]["width"]
                 img_height = jon_dat["compos"][div_list_idx]["height"]
                 #　分割数
-                d_num = 5
+                d_num = 7
                 d_x = int(img_width / d_num)
                 d_y = int(img_height / d_num)
                 # 抽出ポジション初期値
@@ -158,8 +155,11 @@ for i in range(element_num):
                 c = collections.Counter(img_colors)
                 # その領域で最も多い色
                 most_color = c.most_common()[0][0]
+                # 【注意】色は、B G R の順で出力される
                 m_color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
                 print("color = " + str(color))
+
+                col_threshold = int((int(most_color[:3]) + int(most_color[3:6]) + int(most_color[6:]))/3)
 
                 # 領域が文字だった時、文字の色を抽出する。
                 print(jon_dat["compos"][div_list_idx]["class"])
@@ -170,14 +170,19 @@ for i in range(element_num):
                     img_dict = {}
                     img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
                     #　分割数
-                    d_num = 10
+                    d_num = 5
                     d_x = int(img_width / d_num)
                     d_y = int(img_height / d_num)
 
                     # グレースケールに変換
                     # 閾値の設定
-                    threshold = 80
-                    # 二値化(閾値100を超えた画素を255にする。)
+                    # 領域の背景によって変更する。
+                    if col_threshold > 180:
+                        threshold = 220
+                    else:
+                        threshold = 120
+
+                    # 二値化(閾値thresholdを超えた画素を255にする。)
                     ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
 
                     x_col = init_x_col
@@ -203,12 +208,11 @@ for i in range(element_num):
                         second_color = c.most_common()[0][0]
 
                     print("second_color = " + str(second_color))
-
+                    print("\n\n")
                     if second_color == "255":
                         txt_color = "white"
                     else:
                         txt_color = "black"
-                    print("Text")
 
                 # 領域が文字以外の時
                 else:
@@ -231,21 +235,15 @@ for i in range(element_num):
                 
                 with open(filename_css, "a") as f2:
                     f2.writelines(".square" + str(div_list_idx) + "{\n")
-#                    f2.writelines("opacity: 0.25;\n" )
                     f2.writelines("position: absolute;\n" )
                     f2.writelines("top:" + s_top + "px;\n" )
                     f2.writelines("left:" + s_left + "px;\n" )
                     f2.writelines("width:" + s_width + "px;\n" )
                     f2.writelines("height:" + s_height + "px;\n" )
                     color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
-#                    color_str = "background: rgba(" + format(color[2], 'o').zfill(3) + ","  + format(color[1], 'o').zfill(3) + "," + format(color[0], 'o').zfill(3) + ", 0.55 );\n"
                     f2.writelines(color_str)
-#                    txt_color_str = "background: #" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
-                    #txt_color_str = "#" + format(txt_color[2], 'x').zfill(2) + format(txt_color[1], 'x').zfill(2) + format(txt_color[0], 'x').zfill(2) + ";\n"
-                    print("text_colot = " + txt_color)
                     f2.writelines("color: " + txt_color + ";\n")
-#                    f2.writelines("color: black;\n")
-                    f2.writelines("font-size: " + str(int(int(s_height)*0.76)) + "px;\n")
+                    f2.writelines("font-size: " + str(int(int(s_height)*0.75)) + "px;\n")
                     f2.writelines("z-index: " + str(z_index) + ";\n")
                     f2.writelines("}\n\n")
 
