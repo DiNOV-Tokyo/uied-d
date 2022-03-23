@@ -97,20 +97,25 @@ for i in range(element_num):
                 y_top = int(jon_dat["compos"][div_list_idx]["position"]["row_min"])
 
                 # Textを最上部に表示する。
-                # 現状では、画像は、SeekBar で検出される。SeekBarのとき、画像を表示するようにする。
-                if jon_dat["compos"][div_list_idx]["class"] == "Text":
-                    f3.writelines(jon_dat["compos"][div_list_idx]["text_content"] + '\n')
-                    z_index = 200
-                elif jon_dat["compos"][div_list_idx]["class"] == "SeekBar":
+                   # 現状では、画像は、SeekBar で検出される。SeekBarのとき、画像を表示するようにする。
+                if jon_dat["compos"][div_list_idx]["class"] == "SeekBar":
+                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     z_index = 100
                 elif jon_dat["compos"][div_list_idx]["class"] == "Spinner":
+                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     z_index = 80
                 else:
+#                    f3.writelines('<div class="square' + str(div_list_idx) + '" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
                     z_index = 10
 
+
+                if jon_dat["compos"][div_list_idx]["class"] == "Text":
+                    f3.writelines(jon_dat["compos"][div_list_idx]["text_content"] + '\n')
+                    z_index = 200
+                    
                 f3.writelines('</div>\n')
 
                 # 色の抽出
