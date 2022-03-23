@@ -2,6 +2,7 @@ import os
 import cv2
 import json
 import sys
+import collections
 
 args = sys.argv
 # filename without extension
@@ -27,7 +28,7 @@ with open(filename_json, "r") as f:
     jon_dat = json.load(f)
 
 a = json.dumps(jon_dat)
-element_num = a.count('"id":') - 2
+element_num = a.count('"id":') -1
 
 # 背景色を読み取る
 pos = (20, 20)
@@ -72,10 +73,9 @@ for i in range(element_num):
     img1 = img[row_top : row_bottom, col_left : col_right]
     cv2.imwrite(pic_dir + "/out_sample1" + str(i) + ".jpg", img1)
 
-    print("No." + str(i) + ":  width=" + s_width + " height=" + s_height + " Pos_x=" + str(x_c) + " Pos_y=" + str(y_c))
 
 for i in range(element_num):
-    print("No. " + str(i) + "  next: " + str(jon_dat["compos"][i+1]["position"]["row_min"]) + "   now: " + str(jon_dat["compos"][i]["position"]["row_min"]))
+
     next_min = jon_dat["compos"][i+1]["position"]["row_min"]
     now_min = jon_dat["compos"][i]["position"]["row_min"]
     now_height = jon_dat["compos"][i]["height"]
@@ -83,15 +83,12 @@ for i in range(element_num):
     # div 次の段
     if next_min > now_min + now_height:
 
-#    if jon_dat["compos"][i+1]["position"]["row_min"] > jon_dat["compos"][i]["position"]["row_max"]:
         div_list.append(i)
-        print(div_list)
 
         with open(filename_html, "a") as f3:
             z_inded = 0
             f3.writelines('<div class="pbox">\n')
             for div_list_idx in div_list:
-                print(div_list_idx)
 
                 x_left = int(jon_dat["compos"][div_list_idx]["position"]["column_min"])
                 y_top = int(jon_dat["compos"][div_list_idx]["position"]["row_min"])
@@ -99,15 +96,12 @@ for i in range(element_num):
                 # Textを最上部に表示する。
                    # 現状では、画像は、SeekBar で検出される。SeekBarのとき、画像を表示するようにする。
                 if jon_dat["compos"][div_list_idx]["class"] == "SeekBar":
-                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     z_index = 100
                 elif jon_dat["compos"][div_list_idx]["class"] == "Spinner":
-                    #f3.writelines('<div><img src="./pic/out_sample1' + str(div_list_idx) + '.jpg" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '">' + '<img src="' + rel_pic_dir + '/out_sample1' + str(div_list_idx) + '.jpg" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; "></div>\n')
                     z_index = 80
                 else:
-#                    f3.writelines('<div class="square' + str(div_list_idx) + '" style="position: absolute; top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
                     f3.writelines('<div class="square' + str(div_list_idx) + '" style="top: ' + str(y_top) + 'px; left:' + str(x_left) + 'px; ">\n')
                     z_index = 10
 
@@ -115,7 +109,7 @@ for i in range(element_num):
                 if jon_dat["compos"][div_list_idx]["class"] == "Text":
                     f3.writelines(jon_dat["compos"][div_list_idx]["text_content"] + '\n')
                     z_index = 200
-                    
+
                 f3.writelines('</div>\n')
 
                 # 色の抽出
@@ -155,19 +149,15 @@ for i in range(element_num):
                     x_col = x_col + d_x
                     y_col = init_y_col
 
-                import collections
-                #print(img_colors)
                 c = collections.Counter(img_colors)
                 # その領域で最も多い色
                 most_color = c.most_common()[0][0]
                 # 【注意】色は、B G R の順で出力される
                 m_color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
-                print("color = " + str(color))
 
                 col_threshold = int((int(most_color[:3]) + int(most_color[3:6]) + int(most_color[6:]))/3)
 
                 # 領域が文字だった時、文字の色を抽出する。
-                print(jon_dat["compos"][div_list_idx]["class"])
                 if jon_dat["compos"][div_list_idx]["class"] == "Text":
                     # その領域で2番目に多い色を探す
                     # まず、二値化　-> 2番目に多い色を探す。それを文字の色にする
@@ -185,7 +175,7 @@ for i in range(element_num):
                     if col_threshold > 180:
                         threshold = 220
                     else:
-                        threshold = 120
+                        threshold = 100
 
                     # 二値化(閾値thresholdを超えた画素を255にする。)
                     ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
@@ -204,7 +194,7 @@ for i in range(element_num):
                         y_col = init_y_col
 
                     c = collections.Counter(img_colors)
-                    print(c)
+
                     if len(c) > 1:
                         #二値化後も2色（白黒）だったとき
                         second_color = c.most_common()[1][0]
@@ -212,8 +202,6 @@ for i in range(element_num):
                         #二値化の結果、一色だけになったとき
                         second_color = c.most_common()[0][0]
 
-                    print("second_color = " + str(second_color))
-                    print("\n\n")
                     if second_color == "255":
                         txt_color = "white"
                     else:
@@ -259,7 +247,6 @@ for i in range(element_num):
         #pre_row_max = jon_dat["compos"][i]["position"]["row_min"]
         # リストをリセット
         div_list = []
-#        print("Next div")
     # div 同じ段
     else:
         # リストに追加
