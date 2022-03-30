@@ -79,7 +79,7 @@ txt_num_list = []
 
 # JSONファイル内の最初に出てくるテキストかどうか
 txt_flg = True
-
+cnt = 0
 
 for i in range(element_num):
 
@@ -96,18 +96,54 @@ for i in range(element_num):
             print("pre_txt" + str(pre_txt_height))
 
         txt_height = jon_dat["compos"][i]["height"]
-        # ひとつ前のテキストと同じサイズなら、リストに番号を加える。
-        if abs(pre_txt_height - txt_height) < 2:
+        # ひとつ前のテキストとほぼ同じサイズなら、リストに番号を加える。
+        if abs(pre_txt_height - txt_height) < 5:
             txt_num_list.append(i)
 
         # ひとつ前のテキストと異なるサイズなら、１つ前までのテキストをhtmlファイルに書き出し。新たにリストを作る。
         else:
-            for j in txt_num_list:
-                with open(filename_html, "a") as f3:
-                    f3.writelines('<div>\n')
-                    f3.writelines(jon_dat["compos"][j]["text_content"] + '\n')
-                    f3.writelines('<div>\n')
+            print(txt_num_list)
+
+            # 前のリストの最後の文字列と、今回のリストの最初の文字列との間隔を求める。
+            # 前のリストの最後の文字列の番号
+            last_txt_num = int(txt_num_list[0]) - 1
+            # 今回のリストの最初の文字列の番号
+            first_txt_num = int(txt_num_list[0])
+            d_height = int(jon_dat["compos"][first_txt_num]["position"]["row_min"]) - int(jon_dat["compos"][last_txt_num]["position"]["row_max"])
+            if d_height <  0:
+                d_height = 0
+
+            # HTML 入力
+            with open(filename_html, "a") as f3:
+               f3.writelines('<div class="sentence-area' + str(cnt) + '">\n')
+
+               for j in txt_num_list:
+                    f3.writelines('\t <div>\n')
+                    f3.writelines('\t' + jon_dat["compos"][j]["text_content"] + '\n')
+                    f3.writelines('\t </div>\n')
                     print(jon_dat["compos"][j]["text_content"])
+
+               f3.writelines('</div>\n')
+               
+            # CSS 入力   
+            with open(filename_css, "a") as f2:
+                f2.writelines(".sentence-area" + str(cnt) + "{\n")
+#                f2.writelines("position: absolute;\n" )
+#                f2.writelines("top:" + s_top + "px;\n" )
+#                f2.writelines("left:" + s_left + "px;\n" )
+#                f2.writelines("width:" + s_width + "px;\n" )
+#                f2.writelines("height:" + s_height + "px;\n" )
+#                color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
+#                f2.writelines(color_str)
+#                f2.writelines("color: " + txt_color + ";\n")
+                f2.writelines("margin-top: " + str(d_height) + "px;\n")
+                f2.writelines("color: green;\n")
+                f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
+#                f2.writelines("z-index: " + str(z_index) + ";\n")
+                f2.writelines("}\n\n")
+  
+
+            cnt = cnt+ 1
 
             txt_num_list = []
             txt_num_list.append(i)
