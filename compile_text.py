@@ -16,6 +16,9 @@ filename_css = out_dir + "/" + filename + ".css"
 pic_dir = out_dir + "/" + filename + "_pic"
 rel_pic_dir = "./" + filename + "_pic"
 
+# htmlファイルのタブ数のカウント
+tab_num = 0
+
 if not os.path.exists(out_dir):
     # ディレクトリが存在しない場合、ディレクトリを作成する
     os.makedirs(out_dir)
@@ -43,8 +46,12 @@ with open(filename_html, "w") as f3:
     f3.writelines('<head><meta charset="utf-8">\n')
     f3.writelines('<title>タイトル</title>\n')
     f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
-    f3.writelines('</head><body bgcolor="' + color_str + '">\n')
-
+    f3.writelines('</head>\n')
+    f3.writelines('<body bgcolor="' + color_str + '">\n')
+    tb = "\t" * tab_num
+    f3.writelines(tb + '<main>\n')
+    tab_num = tab_num + 1
+    
 with open(filename_css, "w") as f2:
     f2.writelines(".pbox{\n")
     f2.writelines("display: flex;\n")
@@ -81,15 +88,134 @@ txt_num_list = []
 txt_flg = True
 cnt = 0
 
+with open(filename_html, "a") as f3:
+    tb = "\t" * tab_num
+    f3.writelines(tb + '<div class="main-inner">\n')
+    tab_num = tab_num + 1
+
 for i in range(element_num):
 
     next_min = jon_dat["compos"][i+1]["position"]["row_min"]
     now_min = jon_dat["compos"][i]["position"]["row_min"]
     now_height = jon_dat["compos"][i]["height"]
 
+
+    if jon_dat["compos"][i]["class"] == "Image":
+        # HTML 入力
+        with open(filename_html, "a") as f3:
+            tb = "\t" * tab_num
+            f3.writelines(tb + '<div class="figure-area' + str(cnt) + '">\n')
+            tab_num = tab_num + 1
+            tb = "\t" * tab_num
+            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(i) + '.jpg" alt="スマートフォン表示"></figure>\n')
+            tab_num = tab_num + 1
+            tab_num = tab_num - 2
+            tb = "\t" * tab_num
+            f3.writelines(tb + '</div>\n')
+
+
+
     # まずは、classがテキストの場合のみを考慮する。
     if jon_dat["compos"][i]["class"] == "Text":
         print("txt")
+
+        # 色の抽出
+        # 色の抽出は図形の中心ではなく、端っこにした場合。初期のころに使ったが、実際は使わず。
+        #x_col = x_left + 2
+        #y_col = y_top + 2
+        # 色の抽出は図形のマトリックス状のドット位置の色を抽出。最も多い点数の色を背景色とする。
+        # 色の検出
+        # 図形の中心を計算
+        x_c = int((int(jon_dat["compos"][i]["position"]["column_max"]) + int(jon_dat["compos"][i]["position"]["column_min"])) / 2 )
+        y_c = int((int(jon_dat["compos"][i]["position"]["row_max"]) + int(jon_dat["compos"][i]["position"]["row_min"])) / 2 ) 
+        img_width = jon_dat["compos"][i]["width"]
+        img_height = jon_dat["compos"][i]["height"]
+        #　分割数
+        d_num = 7
+        d_x = int(img_width / d_num)
+        d_y = int(img_height / d_num)
+        # 抽出ポジション初期値
+        init_x_col = int(d_x / 2 + jon_dat["compos"][i]["position"]["column_min"])
+        init_y_col = int(d_y / 2 + jon_dat["compos"][i]["position"]["row_min"])
+        x_col = init_x_col
+        y_col = init_y_col
+
+        # その領域で最も多い色を見つけて、それをその領域の色とする。
+        img_colors = []
+        img_dict = {}
+        for kx in range(d_num-1):
+
+            for ky in range(d_num-1):
+                pos = (y_col, x_col)
+                img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
+                img_list = list(img[pos])
+                img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_list[0])+str(img_list[1])+str(img_list[2])}}
+                img_colors.append(str(img_list[0]).zfill(3)+str(img_list[1]).zfill(3)+str(img_list[2]).zfill(3))
+                y_col = y_col + d_y
+
+            x_col = x_col + d_x
+            y_col = init_y_col
+
+        c = collections.Counter(img_colors)
+        # その領域で最も多い色
+        most_color = c.most_common()[0][0]
+        # 【注意】色は、B G R の順で出力される
+        m_color = [int(most_color[:3]), int(most_color[3:6]), int(most_color[6:])]
+
+        col_threshold = int((int(most_color[:3]) + int(most_color[3:6]) + int(most_color[6:]))/3)
+
+        img_width = jon_dat["compos"][i]["width"]
+        img_height = jon_dat["compos"][i]["height"]
+        # その領域で2番目に多い色を探す
+        # まず、二値化　-> 2番目に多い色を探す。それを文字の色にする
+        img_colors = []
+        img_dict = {}
+        img_gray = cv2.imread(filename_img, cv2.IMREAD_GRAYSCALE)
+        #　分割数
+        d_num = 5
+        d_x = int(img_width / d_num)
+        d_y = int(img_height / d_num)
+
+        # グレースケールに変換
+        # 閾値の設定
+        # 領域の背景によって変更する。
+        if col_threshold > 180:
+            threshold = 220
+        else:
+            threshold = 100
+
+        # 二値化(閾値thresholdを超えた画素を255にする。)
+        ret, img_thresh = cv2.threshold(img_gray, threshold, 255, cv2.THRESH_BINARY)
+
+        x_col = init_x_col
+        y_col = init_y_col
+        for kx in range(d_num-1):
+
+            for ky in range(d_num-1):
+                pos = (y_col, x_col)
+                img_dict =  {**img_dict, **{str(kx)+str(ky) : str(img_thresh[pos])}}
+                img_colors.append(str(img_thresh[pos]))
+                y_col = y_col + d_y
+
+            x_col = x_col + d_x
+            y_col = init_y_col
+
+        c = collections.Counter(img_colors)
+
+        if len(c) > 1:
+            #二値化後も2色（白黒）だったとき
+            second_color = c.most_common()[1][0]
+        else:
+            #二値化の結果、一色だけになったとき
+            second_color = c.most_common()[0][0]
+
+        if second_color == "255":
+            txt_color = "white"
+        else:
+            txt_color = "black"
+
+
+
         if txt_flg:
             pre_txt_height = jon_dat["compos"][i]["height"]
             txt_flg = False
@@ -115,15 +241,25 @@ for i in range(element_num):
 
             # HTML 入力
             with open(filename_html, "a") as f3:
-               f3.writelines('<div class="sentence-area' + str(cnt) + '">\n')
+               tb = "\t" * tab_num
+               f3.writelines(tb +'<div class="sentence-area' + str(cnt) + '">\n')
+               tab_num = tab_num + 1
 
                for j in txt_num_list:
-                    f3.writelines('\t <div>\n')
-                    f3.writelines('\t' + jon_dat["compos"][j]["text_content"] + '\n')
-                    f3.writelines('\t </div>\n')
+                    tb = "\t" * tab_num
+                    f3.writelines(tb + '<div>\n')
+                    tab_num = tab_num + 1
+                    tb = "\t" * tab_num
+                    f3.writelines(tb + jon_dat["compos"][j]["text_content"] + '\n')
+                    tab_num = tab_num + 1
+                    tab_num = tab_num - 2
+                    tb = "\t" * tab_num
+                    f3.writelines(tb + '</div>\n')
                     print(jon_dat["compos"][j]["text_content"])
 
-               f3.writelines('</div>\n')
+               tab_num = tab_num - 2
+               tb = "\t" * tab_num
+               f3.writelines(tb + '</div>\n')
                
             # CSS 入力   
             with open(filename_css, "a") as f2:
@@ -137,16 +273,24 @@ for i in range(element_num):
 #                f2.writelines(color_str)
 #                f2.writelines("color: " + txt_color + ";\n")
                 f2.writelines("margin-top: " + str(d_height) + "px;\n")
-                f2.writelines("color: green;\n")
+                f2.writelines("color: " + txt_color + ";\n")
+#                f2.writelines("color: green;\n")
                 f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
 #                f2.writelines("z-index: " + str(z_index) + ";\n")
                 f2.writelines("}\n\n")
   
-
-            cnt = cnt+ 1
-
             txt_num_list = []
             txt_num_list.append(i)
             pre_txt_height = jon_dat["compos"][i]["height"]
 
 
+        cnt = cnt+ 1
+
+
+with open(filename_html, "a") as f3:
+    tab_num = tab_num - 2
+    tb = "\t" * tab_num
+    f3.writelines(tb + '</div>\n')
+    tab_num = tab_num - 2
+    tb = "\t" * tab_num
+    f3.writelines(tb + '</body>\n')
