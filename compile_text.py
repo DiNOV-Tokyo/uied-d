@@ -16,8 +16,70 @@ filename_css = out_dir + "/" + filename + ".css"
 pic_dir = out_dir + "/" + filename + "_pic"
 rel_pic_dir = "./" + filename + "_pic"
 
+
+
+
+
+
+
 # htmlファイルのタブ数のカウント
 tab_num = 0
+# num : 次のtabの数
+# pre_ui: 次は？　<div>:True, </div>:False 
+tab_json={
+    "num": 0,
+    "pre_ui": False,
+}
+
+# html ファイルのタブを調整する
+def tab_str(next_ui):
+    if tab_json["pre_ui"] == True and next_ui == True:
+        current_tab = "\t" * tab_json["num"]
+        tab_json["num"] = tab_json["num"] + 1
+        tab_json["pre_ui"] = True
+    elif tab_json["pre_ui"] == True and next_ui == False:
+        tab_json["num"] = tab_json["num"] - 2
+        current_tab = "\t" * tab_json["num"]
+        tab_json["pre_ui"] = False
+    elif tab_json["pre_ui"] == False and next_ui == True:
+        current_tab = "\t" * tab_json["num"]
+        tab_json["num"] = tab_json["num"] + 1
+        tab_json["pre_ui"] = True
+    elif tab_json["pre_ui"] == False and next_ui == False:
+        tab_json["num"] = tab_json["num"] - 1
+        current_tab = "\t" * tab_json["num"]
+        tab_json["pre_ui"] = False
+
+    return current_tab
+
+# UIエレメントのリスト
+element_list = []
+
+# ブロックのサイズを取得・保存
+def block_size(block_num, block_list):
+    first_block = True
+    for block in block_list:
+        if first_block:
+            first_block_num = block
+            block_top = jon_dat["compos"][first_block_num]["position"]["row_min"]
+            block_bottom = jon_dat["compos"][first_block_num]["position"]["row_max"]
+            block_left = jon_dat["compos"][first_block_num]["position"]["column_min"]
+            block_right = jon_dat["compos"][first_block_num]["position"]["column_max"]
+            first_block = False
+        
+        if block_bottom < jon_dat["compos"][block]["position"]["row_max"]:
+            block_bottom = jon_dat["compos"][block]["position"]["row_max"]
+        
+        if block_left > jon_dat["compos"][block]["position"]["column_min"]:
+            block_left = jon_dat["compos"][block]["position"]["column_min"]
+
+        if block_right < jon_dat["compos"][block]["position"]["column_max"]:
+            block_right = jon_dat["compos"][block]["position"]["column_max"]
+        
+    response = {"block_num": block_num, "block_left": block_left, "block_top": block_top, "block_right": block_right, "block_bottom": block_bottom, "block_list": block_list}
+
+    return json.dumps(response)
+
 
 if not os.path.exists(out_dir):
     # ディレクトリが存在しない場合、ディレクトリを作成する
@@ -32,6 +94,7 @@ with open(filename_json, "r") as f:
 
 a = json.dumps(jon_dat)
 element_num = a.count('"id":') -1
+element_cnt = 0
 
 # 背景色を読み取る
 pos = (20, 20)
@@ -53,10 +116,15 @@ with open(filename_html, "w") as f3:
     tab_num = tab_num + 1
     
 with open(filename_css, "w") as f2:
-    f2.writelines(".pbox{\n")
-    f2.writelines("display: flex;\n")
-    f2.writelines("border: solid 1px transparent;\n")
-    f2.writelines("padding: 5px;\n")
+    f2.writelines("main .main-inner {\n")
+    f2.writelines("\t width: 1000px;\n")
+    f2.writelines("\t margin: 0 auto;\n")
+    f2.writelines("\t display: -webkit-box;\n")
+    f2.writelines("\t display: -ms-flexbox;\n")
+    f2.writelines("\t display: flex;\n")
+    f2.writelines("\t -webkit-box-align: center;\n")
+    f2.writelines("\t -ms-flex-align: center;\n")
+    f2.writelines("\t align-items: center;\n")
     f2.writelines("}\n")
 
 next_div = False
@@ -89,9 +157,8 @@ txt_flg = True
 cnt = 0
 
 with open(filename_html, "a") as f3:
-    tb = "\t" * tab_num
+    tb = tab_str(True)
     f3.writelines(tb + '<div class="main-inner">\n')
-    tab_num = tab_num + 1
 
 for i in range(element_num):
 
@@ -101,16 +168,19 @@ for i in range(element_num):
 
 
     if jon_dat["compos"][i]["class"] == "Image":
+
+        img_num_list = [i]
+        block_size_response = block_size(element_cnt, img_num_list)
+        element_list.append(block_size_response)
+        element_cnt = element_cnt + 1
+
         # HTML 入力
         with open(filename_html, "a") as f3:
-            tb = "\t" * tab_num
+            tb = tab_str(True)
             f3.writelines(tb + '<div class="figure-area' + str(cnt) + '">\n')
-            tab_num = tab_num + 1
-            tb = "\t" * tab_num
+            tb = tab_str(True)
             f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(i) + '.jpg" alt="スマートフォン表示"></figure>\n')
-            tab_num = tab_num + 1
-            tab_num = tab_num - 2
-            tb = "\t" * tab_num
+            tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
 
 
@@ -230,6 +300,10 @@ for i in range(element_num):
         else:
             print(txt_num_list)
 
+            block_size_response = block_size(element_cnt, txt_num_list)
+            element_list.append(block_size_response)
+            element_cnt = element_cnt + 1
+
             # 前のリストの最後の文字列と、今回のリストの最初の文字列との間隔を求める。
             # 前のリストの最後の文字列の番号
             last_txt_num = int(txt_num_list[0]) - 1
@@ -241,24 +315,19 @@ for i in range(element_num):
 
             # HTML 入力
             with open(filename_html, "a") as f3:
-               tb = "\t" * tab_num
+               tb = tab_str(True)
                f3.writelines(tb +'<div class="sentence-area' + str(cnt) + '">\n')
-               tab_num = tab_num + 1
 
                for j in txt_num_list:
-                    tb = "\t" * tab_num
+                    tb = tab_str(True)
                     f3.writelines(tb + '<div>\n')
-                    tab_num = tab_num + 1
-                    tb = "\t" * tab_num
+                    tb = tab_str(True)
                     f3.writelines(tb + jon_dat["compos"][j]["text_content"] + '\n')
-                    tab_num = tab_num + 1
-                    tab_num = tab_num - 2
-                    tb = "\t" * tab_num
+                    tb = tab_str(False)
                     f3.writelines(tb + '</div>\n')
                     print(jon_dat["compos"][j]["text_content"])
 
-               tab_num = tab_num - 2
-               tb = "\t" * tab_num
+               tb = tab_str(False)
                f3.writelines(tb + '</div>\n')
                
             # CSS 入力   
@@ -288,9 +357,10 @@ for i in range(element_num):
 
 
 with open(filename_html, "a") as f3:
-    tab_num = tab_num - 2
-    tb = "\t" * tab_num
+    tb = tab_str(False)
     f3.writelines(tb + '</div>\n')
-    tab_num = tab_num - 2
-    tb = "\t" * tab_num
+    tb = tab_str(False)
     f3.writelines(tb + '</body>\n')
+
+
+print(element_list)
