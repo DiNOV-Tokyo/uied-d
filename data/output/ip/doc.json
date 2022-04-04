@@ -1,0 +1,189 @@
+{
+    "img_shape": [
+        919,
+        1816,
+        3
+    ],
+    "compos": [
+        {
+            "id": 1,
+            "class": "RatingBar",
+            "column_min": 495,
+            "row_min": 61,
+            "column_max": 791,
+            "row_max": 603,
+            "width": 296,
+            "height": 542
+        },
+        {
+            "id": 2,
+            "class": "RatingBar",
+            "column_min": 927,
+            "row_min": 176,
+            "column_max": 1231,
+            "row_max": 216,
+            "width": 304,
+            "height": 40
+        },
+        {
+            "id": 3,
+            "class": "RatingBar",
+            "column_min": 927,
+            "row_min": 232,
+            "column_max": 1263,
+            "row_max": 272,
+            "width": 336,
+            "height": 40
+        },
+        {
+            "id": 4,
+            "class": "Spinner",
+            "column_min": 927,
+            "row_min": 288,
+            "column_max": 1239,
+            "row_max": 336,
+            "width": 312,
+            "height": 48
+        },
+        {
+            "id": 5,
+            "class": "RatingBar",
+            "column_min": 927,
+            "row_min": 392,
+            "column_max": 1303,
+            "row_max": 424,
+            "width": 376,
+            "height": 32
+        },
+        {
+            "id": 6,
+            "class": "RatingBar",
+            "column_min": 1311,
+            "row_min": 392,
+            "column_max": 1535,
+            "row_max": 424,
+            "width": 224,
+            "height": 32
+        },
+        {
+            "id": 7,
+            "class": "RatingBar",
+            "column_min": 927,
+            "row_min": 432,
+            "column_max": 1271,
+            "row_max": 464,
+            "width": 344,
+            "height": 32
+        },
+        {
+            "id": 8,
+            "class": "RatingBar",
+            "column_min": 1284,
+            "row_min": 432,
+            "column_max": 1535,
+            "row_max": 464,
+            "width": 251,
+            "height": 32
+        },
+        {
+            "id": 9,
+            "class": "RatingBar",
+            "column_min": 922,
+            "row_min": 472,
+            "column_max": 1367,
+            "row_max": 504,
+            "width": 445,
+            "height": 32
+        },
+        {
+            "id": 10,
+            "class": "RatingBar",
+            "column_min": 1375,
+            "row_min": 472,
+            "column_max": 1527,
+            "row_max": 504,
+            "width": 152,
+            "height": 32
+        },
+        {
+            "id": 11,
+            "class": "ToggleButton",
+            "column_min": 863,
+            "row_min": 768,
+            "column_max": 959,
+            "row_max": 801,
+            "width": 96,
+            "height": 33
+        },
+        {
+            "id": 12,
+            "class": "RatingBar",
+            "column_min": 295,
+            "row_min": 840,
+            "column_max": 375,
+            "row_max": 864,
+            "width": 80,
+            "height": 24
+        },
+        {
+            "id": 13,
+            "class": "RatingBar",
+            "column_min": 415,
+            "row_min": 840,
+            "column_max": 583,
+            "row_max": 864,
+            "width": 168,
+            "height": 24
+        },
+        {
+            "id": 14,
+            "class": "RatingBar",
+            "column_min": 591,
+            "row_min": 840,
+            "column_max": 1055,
+            "row_max": 865,
+            "width": 464,
+            "height": 25
+        },
+        {
+            "id": 15,
+            "class": "RatingBar",
+            "column_min": 1063,
+            "row_min": 840,
+            "column_max": 1327,
+            "row_max": 864,
+            "width": 264,
+            "height": 24
+        },
+        {
+            "id": 16,
+            "class": "RatingBar",
+            "column_min": 383,
+            "row_min": 848,
+            "column_max": 407,
+            "row_max": 864,
+            "width": 24,
+            "height": 16
+        },
+        {
+            "id": 17,
+            "class": "RatingBar",
+            "column_min": 287,
+            "row_min": 872,
+            "column_max": 367,
+            "row_max": 897,
+            "width": 80,
+            "height": 25
+        },
+        {
+            "id": 18,
+            "class": "RatingBar",
+            "column_min": 375,
+            "row_min": 872,
+            "column_max": 1053,
+            "row_max": 896,
+            "width": 678,
+            "height": 24
+        }
+    ]
+}

@@ -1,0 +1,379 @@
+{
+    "img_shape": [
+        933,
+        1502,
+        3
+    ],
+    "compos": [
+        {
+            "id": 1,
+            "class": "RatingBar",
+            "column_min": 524,
+            "row_min": 15,
+            "column_max": 929,
+            "row_max": 89,
+            "width": 405,
+            "height": 74
+        },
+        {
+            "id": 2,
+            "class": "Spinner",
+            "column_min": 119,
+            "row_min": 113,
+            "column_max": 1303,
+            "row_max": 169,
+            "width": 1184,
+            "height": 56
+        },
+        {
+            "id": 3,
+            "class": "RatingBar",
+            "column_min": 103,
+            "row_min": 193,
+            "column_max": 494,
+            "row_max": 246,
+            "width": 391,
+            "height": 53
+        },
+        {
+            "id": 4,
+            "class": "RatingBar",
+            "column_min": 961,
+            "row_min": 193,
+            "column_max": 1349,
+            "row_max": 246,
+            "width": 388,
+            "height": 53
+        },
+        {
+            "id": 5,
+            "class": "RatingBar",
+            "column_min": 531,
+            "row_min": 193,
+            "column_max": 921,
+            "row_max": 246,
+            "width": 390,
+            "height": 53
+        },
+        {
+            "id": 6,
+            "class": "Spinner",
+            "column_min": 951,
+            "row_min": 265,
+            "column_max": 1351,
+            "row_max": 560,
+            "width": 400,
+            "height": 295
+        },
+        {
+            "id": 7,
+            "class": "Spinner",
+            "column_min": 95,
+            "row_min": 273,
+            "column_max": 503,
+            "row_max": 567,
+            "width": 408,
+            "height": 294
+        },
+        {
+            "id": 8,
+            "class": "Spinner",
+            "column_min": 527,
+            "row_min": 275,
+            "column_max": 927,
+            "row_max": 568,
+            "width": 400,
+            "height": 293
+        },
+        {
+            "id": 9,
+            "class": "Spinner",
+            "column_min": 591,
+            "row_min": 304,
+            "column_max": 743,
+            "row_max": 336,
+            "width": 152,
+            "height": 32
+        },
+        {
+            "id": 10,
+            "class": "Spinner",
+            "column_min": 751,
+            "row_min": 304,
+            "column_max": 855,
+            "row_max": 336,
+            "width": 104,
+            "height": 32
+        },
+        {
+            "id": 11,
+            "class": "Spinner",
+            "column_min": 1031,
+            "row_min": 305,
+            "column_max": 1271,
+            "row_max": 336,
+            "width": 240,
+            "height": 31
+        },
+        {
+            "id": 12,
+            "class": "RatingBar",
+            "column_min": 559,
+            "row_min": 342,
+            "column_max": 895,
+            "row_max": 351,
+            "width": 336,
+            "height": 9
+        },
+        {
+            "id": 13,
+            "class": "RadioButton",
+            "column_min": 983,
+            "row_min": 343,
+            "column_max": 1327,
+            "row_max": 357,
+            "width": 344,
+            "height": 14
+        },
+        {
+            "id": 14,
+            "class": "RatingBar",
+            "column_min": 557,
+            "row_min": 370,
+            "column_max": 721,
+            "row_max": 440,
+            "width": 164,
+            "height": 70
+        },
+        {
+            "id": 15,
+            "class": "RatingBar",
+            "column_min": 750,
+            "row_min": 369,
+            "column_max": 895,
+            "row_max": 544,
+            "width": 145,
+            "height": 175
+        },
+        {
+            "id": 16,
+            "class": "Spinner",
+            "column_min": 983,
+            "row_min": 368,
+            "column_max": 1295,
+            "row_max": 408,
+            "width": 312,
+            "height": 40
+        },
+        {
+            "id": 17,
+            "class": "Spinner",
+            "column_min": 983,
+            "row_min": 424,
+            "column_max": 1143,
+            "row_max": 520,
+            "width": 160,
+            "height": 96
+        },
+        {
+            "id": 18,
+            "class": "RadioButton",
+            "column_min": 1154,
+            "row_min": 421,
+            "column_max": 1327,
+            "row_max": 529,
+            "width": 173,
+            "height": 108
+        },
+        {
+            "id": 19,
+            "class": "Spinner",
+            "column_min": 559,
+            "row_min": 451,
+            "column_max": 671,
+            "row_max": 489,
+            "width": 112,
+            "height": 38
+        },
+        {
+            "id": 20,
+            "class": "Spinner",
+            "column_min": 559,
+            "row_min": 500,
+            "column_max": 703,
+            "row_max": 536,
+            "width": 144,
+            "height": 36
+        },
+        {
+            "id": 21,
+            "class": "Spinner",
+            "column_min": 527,
+            "row_min": 569,
+            "column_max": 927,
+            "row_max": 841,
+            "width": 400,
+            "height": 272
+        },
+        {
+            "id": 22,
+            "class": "Spinner",
+            "column_min": 95,
+            "row_min": 577,
+            "column_max": 503,
+            "row_max": 841,
+            "width": 408,
+            "height": 264
+        },
+        {
+            "id": 23,
+            "class": "Spinner",
+            "column_min": 951,
+            "row_min": 577,
+            "column_max": 1351,
+            "row_max": 841,
+            "width": 400,
+            "height": 264
+        },
+        {
+            "id": 24,
+            "class": "Spinner",
+            "column_min": 1143,
+            "row_min": 612,
+            "column_max": 1295,
+            "row_max": 645,
+            "width": 152,
+            "height": 33
+        },
+        {
+            "id": 25,
+            "class": "Spinner",
+            "column_min": 199,
+            "row_min": 616,
+            "column_max": 391,
+            "row_max": 642,
+            "width": 192,
+            "height": 26
+        },
+        {
+            "id": 26,
+            "class": "Spinner",
+            "column_min": 1007,
+            "row_min": 616,
+            "column_max": 1135,
+            "row_max": 641,
+            "width": 128,
+            "height": 25
+        },
+        {
+            "id": 27,
+            "class": "RadioButton",
+            "column_min": 127,
+            "row_min": 648,
+            "column_max": 472,
+            "row_max": 664,
+            "width": 345,
+            "height": 16
+        },
+        {
+            "id": 28,
+            "class": "RadioButton",
+            "column_min": 983,
+            "row_min": 647,
+            "column_max": 1327,
+            "row_max": 664,
+            "width": 344,
+            "height": 17
+        },
+        {
+            "id": 29,
+            "class": "Spinner",
+            "column_min": 127,
+            "row_min": 672,
+            "column_max": 311,
+            "row_max": 712,
+            "width": 184,
+            "height": 40
+        },
+        {
+            "id": 30,
+            "class": "ImageButton",
+            "column_min": 983,
+            "row_min": 674,
+            "column_max": 1039,
+            "row_max": 744,
+            "width": 56,
+            "height": 70
+        },
+        {
+            "id": 31,
+            "class": "SeekBar",
+            "column_min": 1061,
+            "row_min": 712,
+            "column_max": 1119,
+            "row_max": 744,
+            "width": 58,
+            "height": 32
+        },
+        {
+            "id": 32,
+            "class": "Spinner",
+            "column_min": 127,
+            "row_min": 720,
+            "column_max": 279,
+            "row_max": 770,
+            "width": 152,
+            "height": 50
+        },
+        {
+            "id": 33,
+            "class": "RatingBar",
+            "column_min": 1045,
+            "row_min": 720,
+            "column_max": 1056,
+            "row_max": 735,
+            "width": 11,
+            "height": 15
+        },
+        {
+            "id": 34,
+            "class": "SeekBar",
+            "column_min": 311,
+            "row_min": 725,
+            "column_max": 487,
+            "row_max": 832,
+            "width": 176,
+            "height": 107
+        },
+        {
+            "id": 35,
+            "class": "Spinner",
+            "column_min": 983,
+            "row_min": 760,
+            "column_max": 1135,
+            "row_max": 832,
+            "width": 152,
+            "height": 72
+        },
+        {
+            "id": 36,
+            "class": "Spinner",
+            "column_min": 127,
+            "row_min": 772,
+            "column_max": 255,
+            "row_max": 808,
+            "width": 128,
+            "height": 36
+        },
+        {
+            "id": 37,
+            "class": "RatingBar",
+            "column_min": 133,
+            "row_min": 493,
+            "column_max": 309,
+            "row_max": 533,
+            "width": 176,
+            "height": 40
+        }
+    ]
+}
