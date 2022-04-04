@@ -48,6 +48,8 @@ tab_json={
 
 # html ファイルのタブを調整する
 def tab_str(next_ui):
+    # next_ui : 次の来るのが開始タグ(<div>など)のとき　True
+    # next_ui : 次の来るのが終了タグ(</div>など)のとき　False
     if tab_json["pre_ui"] == True and next_ui == True:
         current_tab = "\t" * tab_json["num"]
         tab_json["num"] = tab_json["num"] + 1
@@ -100,6 +102,8 @@ def block_size(block_num, block_type, block_list, color):
         "block_bottom": block_bottom, 
         "block_list": block_list,
         "color": color,
+        "div_num": 0,
+        "col_num": 0,
         }
 
     return json.dumps(response)
@@ -251,36 +255,6 @@ def text_color(idx):
     return txt_color
 
 
-# 背景色を読み取る
-pos = (20, 20)
-img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
-color = list(img[pos])
-color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
-print("color=" + str(color_str))
-print(element_num)
-with open(filename_html, "w") as f3:
-    f3.writelines('<!DOCTYPE html>\n')
-    f3.writelines('<html lang="ja">\n')
-    f3.writelines('<head><meta charset="utf-8">\n')
-    f3.writelines('<title>タイトル</title>\n')
-    f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
-    f3.writelines('</head>\n')
-    f3.writelines('<body bgcolor="' + color_str + '">\n')
-    tb = "\t" * tab_num
-    f3.writelines(tb + '<main>\n')
-    tab_num = tab_num + 1
-    
-with open(filename_css, "w") as f2:
-    f2.writelines("main .main-inner {\n")
-    f2.writelines("\t width: 1000px;\n")
-    f2.writelines("\t margin: 0 auto;\n")
-    f2.writelines("\t display: -webkit-box;\n")
-    f2.writelines("\t display: -ms-flexbox;\n")
-    f2.writelines("\t display: flex;\n")
-    f2.writelines("\t -webkit-box-align: center;\n")
-    f2.writelines("\t -ms-flex-align: center;\n")
-    f2.writelines("\t align-items: center;\n")
-    f2.writelines("}\n")
 
 next_div = False
 pre_row_min = 0
@@ -311,9 +285,6 @@ txt_num_list = []
 txt_flg = True
 cnt = 0
 
-with open(filename_html, "a") as f3:
-    tb = tab_str(True)
-    f3.writelines(tb + '<div class="main-inner">\n')
 
 for i in range(element_num):
 
@@ -330,14 +301,6 @@ for i in range(element_num):
         element_list.append(block_size_response)
         element_cnt = element_cnt + 1
 
-        # HTML 入力
-        with open(filename_html, "a") as f3:
-            tb = tab_str(True)
-            f3.writelines(tb + '<div class="figure-area' + str(cnt) + '">\n')
-            tb = tab_str(True)
-            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(i) + '.jpg" alt="スマートフォン表示"></figure>\n')
-            tb = tab_str(False)
-            f3.writelines(tb + '</div>\n')
 
 
 
@@ -375,26 +338,180 @@ for i in range(element_num):
             if d_height <  0:
                 d_height = 0
 
-            # HTML 入力
+
+            txt_num_list = []
+            txt_num_list.append(i)
+            pre_txt_height = jon_dat["compos"][i]["height"]
+
+
+        cnt = cnt+ 1
+
+# Elementのレイアウトを検出
+# Element(block)の相互配置を確認しながらhtml/cssを書き出す。
+a = json.dumps(element_list)
+print(type(element_list))
+element_num = a.count('block_num') 
+div_num = 0
+col_num = 0
+# 最初のElementかどうか
+element_1st_flg = True
+element_result = []
+
+for j in range(element_num):
+    print(j)
+    if element_1st_flg:
+        element_list_chkd = json.loads(element_list[0])
+        element_list_chkd["div_num"] = div_num
+        element_list_chkd["col_num"] = col_num
+        element_1st_flg = False
+        element_result.append(element_list_chkd)
+
+    else:
+        element_list_chkd_pre = json.loads(element_list[j-1])
+        element_list_chkd = json.loads(element_list[j])
+        block_center_x_pre = (element_list_chkd_pre["block_right"] + element_list_chkd_pre["block_left"]) / 2
+        block_center_y_pre = (element_list_chkd_pre["block_bottom"] + element_list_chkd_pre["block_top"]) / 2
+        block_center_x = (element_list_chkd["block_right"] + element_list_chkd["block_left"]) / 2
+        block_center_y = (element_list_chkd["block_bottom"] + element_list_chkd["block_top"]) / 2
+
+        # レイアウトの検出
+        # 左右か？
+        if element_list_chkd_pre["block_right"] < element_list_chkd["block_left"]:
+            # 左右並びになっている -> 次の列に移動
+            col_num = col_num + 1
+            element_list_chkd["col_num"] = col_num
+            element_result.append(element_list_chkd)
+        
+        # 次のdivか？
+        elif block_center_x + 300 < block_center_x_pre and block_center_y > block_center_y_pre:
+            # 次のdiv
+            col_num = 0
+            div_num = div_num + 1
+            element_list_chkd["col_num"] = col_num
+            element_list_chkd["div_num"] = div_num
+            element_result.append(element_list_chkd)
+
+        else:
+            element_list_chkd["col_num"] = col_num
+            element_list_chkd["div_num"] = div_num
+            element_result.append(element_list_chkd)
+
+
+#################################################
+# html / css の生成
+##################################################
+with open(filename_html, "a") as f3:
+    tb = tab_str(True)
+    f3.writelines(tb + '<div class="main-inner">\n')
+
+# 背景色を読み取る
+pos = (20, 20)
+img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
+color = list(img[pos])
+color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
+print("color=" + str(color_str))
+print(element_num)
+with open(filename_html, "w") as f3:
+    f3.writelines('<!DOCTYPE html>\n')
+    f3.writelines('<html lang="ja">\n')
+    f3.writelines('<head><meta charset="utf-8">\n')
+    f3.writelines('<title>タイトル</title>\n')
+    f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
+    f3.writelines('</head>\n')
+    f3.writelines('<body bgcolor="' + color_str + '">\n')
+    tb = tab_str(True)
+    f3.writelines(tb + '<main>\n')
+
+    
+with open(filename_css, "w") as f2:
+    f2.writelines("main .main-inner {\n")
+    f2.writelines("\t width: 1000px;\n")
+    f2.writelines("\t margin: 0 auto;\n")
+    f2.writelines("\t display: -webkit-box;\n")
+    f2.writelines("\t display: -ms-flexbox;\n")
+    f2.writelines("\t display: flex;\n")
+    f2.writelines("\t -webkit-box-align: center;\n")
+    f2.writelines("\t -ms-flex-align: center;\n")
+    f2.writelines("\t align-items: center;\n")
+    f2.writelines("}\n")
+
+pre_div_num = 0
+pre_col_num = 0
+cnt = 0
+for j in range(element_num):
+
+    element = element_result[j]
+    print("col_num = " + str(element["col_num"]) + "  div_num:" + str(element["div_num"]) + "\n")
+    if j == 0:
+        with open(filename_html, "a") as f3:
+            tb = tab_str(True)
+            f3.writelines(tb + '<div class="div' + str(cnt) + '">\n')
+        cnt = cnt + 1
+        pre_div_num == element["div_num"]
+
+        with open(filename_html, "a") as f3:
+            tb = tab_str(True)
+            f3.writelines(tb + '<div class="col' + str(cnt) + '">\n')
+        cnt = cnt + 1
+        pre_col_num == element["col_num"]
+
+    else:
+        if pre_col_num == element["col_num"]:
+            print("col_num passed")
+            pass
+        else:
             with open(filename_html, "a") as f3:
-               tb = tab_str(True)
-               f3.writelines(tb +'<div class="sentence-area' + str(cnt) + '">\n')
+                tb = tab_str(False)
+                f3.writelines(tb + '</div>\n')
+                tb = tab_str(True)
+                f3.writelines(tb + '<div class="col' + str(cnt) + '">\n')
+            cnt = cnt + 1
+        
+        pre_col_num = element["col_num"]
 
-               for j in txt_num_list:
-                    tb = tab_str(True)
-                    f3.writelines(tb + '<div>\n')
-                    tb = tab_str(True)
-                    f3.writelines(tb + jon_dat["compos"][j]["text_content"] + '\n')
-                    tb = tab_str(False)
-                    f3.writelines(tb + '</div>\n')
-                    print(jon_dat["compos"][j]["text_content"])
+        if pre_div_num == element["div_num"]:
+            print("div_num passed")
+            pass
+        else:
+            with open(filename_html, "a") as f3:
+                tb = tab_str(False)
+                f3.writelines(tb + '</div>\n')
+                tb = tab_str(True)
+                f3.writelines(tb + '<div class="div' + str(cnt) + '">\n')
+            cnt = cnt + 1
+        
+        pre_div_num = element["div_num"]
 
-               tb = tab_str(False)
-               f3.writelines(tb + '</div>\n')
-               
-            # CSS 入力   
-            with open(filename_css, "a") as f2:
-                f2.writelines(".sentence-area" + str(cnt) + "{\n")
+
+    if element["block_type"] == "Image":
+        with open(filename_html, "a") as f3:
+            tb = tab_str(True)
+            f3.writelines(tb + '<div class="figure-area' + str(cnt) + '">\n')
+            tb = tab_str(True)
+            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(i) + '.jpg" alt="スマートフォン表示"></figure>\n')
+            tb = tab_str(False)
+            f3.writelines(tb + '</div>\n')
+
+    elif element["block_type"] == "Text":
+        with open(filename_html, "a") as f3:
+            tb = tab_str(True)
+            f3.writelines(tb +'<div class="sentence-area' + str(cnt) + '">\n')
+
+            for k in element["block_list"]:
+                tb = tab_str(True)
+                f3.writelines(tb + '<div>\n')
+                tb = tab_str(True)
+                f3.writelines(tb + jon_dat["compos"][k]["text_content"] + '\n')
+                tb = tab_str(False)
+                f3.writelines(tb + '</div>\n')
+                print(jon_dat["compos"][k]["text_content"])
+
+            tb = tab_str(False)
+            f3.writelines(tb + '</div>\n')
+            
+    # CSS 入力   
+    with open(filename_css, "a") as f2:
+        f2.writelines(".sentence-area" + str(cnt) + "{\n")
 #                f2.writelines("position: absolute;\n" )
 #                f2.writelines("top:" + s_top + "px;\n" )
 #                f2.writelines("left:" + s_left + "px;\n" )
@@ -403,39 +520,23 @@ for i in range(element_num):
 #                color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
 #                f2.writelines(color_str)
 #                f2.writelines("color: " + txt_color + ";\n")
-                f2.writelines("margin-top: " + str(d_height) + "px;\n")
-                f2.writelines("color: " + txt_color + ";\n")
+        f2.writelines("margin-top: " + str(d_height) + "px;\n")
+        f2.writelines("color: " + txt_color + ";\n")
 #                f2.writelines("color: green;\n")
-                f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
+        f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
 #                f2.writelines("z-index: " + str(z_index) + ";\n")
-                f2.writelines("}\n\n")
-  
-            txt_num_list = []
-            txt_num_list.append(i)
-            pre_txt_height = jon_dat["compos"][i]["height"]
-
-
-        cnt = cnt+ 1
-
-
-# Element(block)の相互配置を確認しながらhtml/cssを書き出す。
-a = json.dumps(element_list)
-element_num = a.count('block_num') -1
-div_num = 0
-col_num = 0
-
-for j in range(element_num):
-    print(j)
-
-
-
+        f2.writelines("}\n\n")
 
 
 with open(filename_html, "a") as f3:
     tb = tab_str(False)
     f3.writelines(tb + '</div>\n')
     tb = tab_str(False)
+    f3.writelines(tb + '</div>\n')
+    tb = tab_str(False)
+    f3.writelines(tb + '</main>\n')
+    tb = tab_str(False)
     f3.writelines(tb + '</body>\n')
 
-
 print(element_list)
+print(element_result)

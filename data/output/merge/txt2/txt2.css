@@ -1,0 +1,293 @@
+.pbox{
+display: flex;
+border: solid 1px transparent;
+padding: 5px;
+}
+.square0{
+position: absolute;
+top:24px;
+left:88px;
+width:415px;
+height:264px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 198px;
+z-index: 80;
+}
+
+.square1{
+position: absolute;
+top:20px;
+left:519px;
+width:408px;
+height:268px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 201px;
+z-index: 80;
+}
+
+.square2{
+position: absolute;
+top:24px;
+left:943px;
+width:408px;
+height:264px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 198px;
+z-index: 80;
+}
+
+.square3{
+position: absolute;
+top:57px;
+left:1001px;
+width:294px;
+height:31px;
+background: rgba(254,254,254, 0.95 );
+color: black;
+font-size: 23px;
+z-index: 80;
+}
+
+.square4{
+position: absolute;
+top:94px;
+left:980px;
+width:346px;
+height:12px;
+background: rgba(234,253,255, 0.95 );
+color: black;
+font-size: 9px;
+z-index: 10;
+}
+
+.square5{
+position: absolute;
+top:120px;
+left:979px;
+width:62px;
+height:72px;
+background: rgba(251,251,249, 0.95 );
+color: black;
+font-size: 54px;
+z-index: 10;
+}
+
+.square6{
+position: absolute;
+top:131px;
+left:1149px;
+width:177px;
+height:149px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 111px;
+z-index: 10;
+}
+
+.square7{
+position: absolute;
+top:159px;
+left:1042px;
+width:77px;
+height:30px;
+background: rgba(254,254,254, 0.95 );
+color: black;
+font-size: 22px;
+z-index: 10;
+}
+
+.square8{
+position: absolute;
+top:208px;
+left:977px;
+width:158px;
+height:68px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 51px;
+z-index: 80;
+}
+
+.square9{
+position: absolute;
+top:38px;
+left:94px;
+width:6px;
+height:245px;
+background: rgba(242,242,242, 0.95 );
+color: black;
+font-size: 183px;
+z-index: 10;
+}
+
+.square10{
+position: absolute;
+top:64px;
+left:203px;
+width:180px;
+height:20px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 15px;
+z-index: 200;
+}
+
+.square11{
+position: absolute;
+top:63px;
+left:604px;
+width:233px;
+height:19px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 14px;
+z-index: 200;
+}
+
+.square12{
+position: absolute;
+top:63px;
+left:1006px;
+width:283px;
+height:21px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 15px;
+z-index: 200;
+}
+
+.square13{
+position: absolute;
+top:130px;
+left:597px;
+width:82px;
+height:16px;
+background: rgba(205,164,050, 0.95 );
+color: white;
+font-size: 12px;
+z-index: 200;
+}
+
+.square14{
+position: absolute;
+top:125px;
+left:986px;
+width:48px;
+height:26px;
+background: rgba(250,250,248, 0.95 );
+color: black;
+font-size: 19px;
+z-index: 200;
+}
+
+.square15{
+position: absolute;
+top:158px;
+left:986px;
+width:124px;
+height:27px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 20px;
+z-index: 200;
+}
+
+.square16{
+position: absolute;
+top:159px;
+left:559px;
+width:97px;
+height:26px;
+background: rgba(251,251,251, 0.95 );
+color: black;
+font-size: 19px;
+z-index: 200;
+}
+
+.square17{
+position: absolute;
+top:124px;
+left:131px;
+width:173px;
+height:27px;
+background: rgba(254,254,254, 0.95 );
+color: black;
+font-size: 20px;
+z-index: 200;
+}
+
+.square18{
+position: absolute;
+top:166px;
+left:131px;
+width:140px;
+height:20px;
+background: rgba(253,255,252, 0.95 );
+color: black;
+font-size: 15px;
+z-index: 200;
+}
+
+.square19{
+position: absolute;
+top:190px;
+left:131px;
+width:95px;
+height:19px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 14px;
+z-index: 200;
+}
+
+.square20{
+position: absolute;
+top:176px;
+left:762px;
+width:46px;
+height:10px;
+background: rgba(252,252,252, 0.95 );
+color: black;
+font-size: 7px;
+z-index: 200;
+}
+
+.square21{
+position: absolute;
+top:185px;
+left:764px;
+width:42px;
+height:8px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 6px;
+z-index: 200;
+}
+
+.square22{
+position: absolute;
+top:170px;
+left:836px;
+width:55px;
+height:18px;
+background: rgba(249,249,249, 0.95 );
+color: black;
+font-size: 13px;
+z-index: 200;
+}
+
+.square23{
+position: absolute;
+top:212px;
+left:986px;
+width:75px;
+height:18px;
+background: rgba(255,255,255, 0.95 );
+color: black;
+font-size: 13px;
+z-index: 200;
+}
+

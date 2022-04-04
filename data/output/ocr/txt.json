@@ -1,0 +1,69 @@
+{
+    "img_shape": [
+        632,
+        1467,
+        3
+    ],
+    "texts": [
+        {
+            "id": 0,
+            "content": "\u307e\u305a\u306f \u7121\u6599 \u3067 \u4f1a\u54e1 \u767b\u9332",
+            "column_min": 581,
+            "row_min": 39,
+            "column_max": 837,
+            "row_max": 65,
+            "width": 256,
+            "height": 26
+        },
+        {
+            "id": 1,
+            "content": "\u4ed5\u4e8b \u306e \u7a2e\u985e \u306f 200 \u7a2e\u985e \u4ee5\u4e0a \u3002 \u3054 \u8981\u671b \u306b \u3042\u308f\u305b \u3066 \u767a\u6ce8 \u3067\u304d \u307e\u3059 \u3002",
+            "column_min": 111,
+            "row_min": 136,
+            "column_max": 1281,
+            "row_max": 179,
+            "width": 1170,
+            "height": 43
+        },
+        {
+            "id": 2,
+            "content": "\u4e8b\u52d9 \u4f5c\u696d \u306e \u767a\u6ce8",
+            "column_min": 200,
+            "row_min": 214,
+            "column_max": 363,
+            "row_max": 240,
+            "width": 163,
+            "height": 26
+        },
+        {
+            "id": 3,
+            "content": "\u30c7\u30b6\u30a4\u30f3 \u306e \u767a\u6ce8",
+            "column_min": 627,
+            "row_min": 214,
+            "column_max": 790,
+            "row_max": 240,
+            "width": 163,
+            "height": 26
+        },
+        {
+            "id": 4,
+            "content": "\u304a\u3059\u3059\u3081 \u306e \u767a\u6ce8",
+            "column_min": 1055,
+            "row_min": 213,
+            "column_max": 1218,
+            "row_max": 241,
+            "width": 163,
+            "height": 28
+        },
+        {
+            "id": 5,
+            "content": "Txt test",
+            "column_min": 539,
+            "row_min": 308,
+            "column_max": 675,
+            "row_max": 340,
+            "width": 136,
+            "height": 32
+        }
+    ]
+}
