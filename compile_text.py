@@ -73,7 +73,7 @@ def tab_str(next_ui):
 element_list = []
 
 # ブロックのサイズを取得・保存
-def block_size(block_num, block_type, block_list, color):
+def block_size(block_num, block_type, block_list, color, txt_size):
     first_block = True
     for block in block_list:
         if first_block:
@@ -102,6 +102,7 @@ def block_size(block_num, block_type, block_list, color):
         "block_bottom": block_bottom, 
         "block_list": block_list,
         "color": color,
+        "txt_size": txt_size,
         "div_num": 0,
         "col_num": 0,
         }
@@ -255,6 +256,31 @@ def text_color(idx):
     return txt_color
 
 
+def css_write(element, class_list):
+    
+    class_n = ""
+    for class_name in class_list:
+        class_n = class_n + " ." + class_name
+
+    # CSS 入力   
+    with open(filename_css, "a") as f2:
+        f2.writelines(class_n + "{\n")
+#                f2.writelines("position: absolute;\n" )
+#                f2.writelines("top:" + s_top + "px;\n" )
+#                f2.writelines("left:" + s_left + "px;\n" )
+#                f2.writelines("width:" + s_width + "px;\n" )
+#                f2.writelines("height:" + s_height + "px;\n" )
+#                color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
+#                f2.writelines(color_str)
+#                f2.writelines("color: " + txt_color + ";\n")
+#        f2.writelines("margin-top: " + str(d_height) + "px;\n")
+        f2.writelines("color: " + element["color"] + ";\n")
+#                f2.writelines("color: green;\n")
+        f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
+#                f2.writelines("z-index: " + str(z_index) + ";\n")
+        f2.writelines("}\n\n")
+
+
 
 next_div = False
 pre_row_min = 0
@@ -297,7 +323,11 @@ for i in range(element_num):
 
         a_color = area_color(i)
         img_num_list = [i]
-        block_size_response = block_size(element_cnt, "Image", img_num_list, a_color)
+
+        # テキストのサイズ （これは意味がないが、テキストのリストの情報と併せるため）
+        txt_size = jon_dat["compos"][i]["height"]
+
+        block_size_response = block_size(element_cnt, "Image", img_num_list, a_color, txt_size)
         element_list.append(block_size_response)
         element_cnt = element_cnt + 1
 
@@ -325,7 +355,10 @@ for i in range(element_num):
             # テキストの文字色を求める。
             txt_color= text_color(i)
 
-            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color)
+            # テキストのサイズ
+            txt_size = jon_dat["compos"][i]["height"]
+
+            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size)
             element_list.append(block_size_response)
             element_cnt = element_cnt + 1
 
@@ -411,6 +444,9 @@ color = list(img[pos])
 color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
 print("color=" + str(color_str))
 print(element_num)
+class_list = []
+class_str = ""
+
 with open(filename_html, "w") as f3:
     f3.writelines('<!DOCTYPE html>\n')
     f3.writelines('<html lang="ja">\n')
@@ -419,12 +455,15 @@ with open(filename_html, "w") as f3:
     f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
     f3.writelines('</head>\n')
     f3.writelines('<body bgcolor="' + color_str + '">\n')
+    class_str = "main"
+    class_list.append(class_str)
+    print(class_list)
     tb = tab_str(True)
-    f3.writelines(tb + '<main>\n')
+    f3.writelines(tb + '<' + class_str +'>\n')
 
     
 with open(filename_css, "w") as f2:
-    f2.writelines("main .main-inner {\n")
+    f2.writelines("main .div1 {\n")
     f2.writelines("\t width: 1000px;\n")
     f2.writelines("\t margin: 0 auto;\n")
     f2.writelines("\t display: -webkit-box;\n")
@@ -440,32 +479,47 @@ pre_col_num = 0
 cnt = 0
 for j in range(element_num):
 
+    cnt = cnt + 1
+
     element = element_result[j]
     print("col_num = " + str(element["col_num"]) + "  div_num:" + str(element["div_num"]) + "\n")
+
+    # 最初の要素か？
     if j == 0:
         with open(filename_html, "a") as f3:
+            class_str = "div" + str(cnt)
+            class_list.append(class_str)
+            print(class_list)
             tb = tab_str(True)
-            f3.writelines(tb + '<div class="div' + str(cnt) + '">\n')
-        cnt = cnt + 1
+            f3.writelines(tb + '<div class="' + class_str + '">\n')
         pre_div_num == element["div_num"]
 
         with open(filename_html, "a") as f3:
+            class_str = "col" + str(cnt)
+            class_list.append(class_str)
+            print(class_list)
             tb = tab_str(True)
-            f3.writelines(tb + '<div class="col' + str(cnt) + '">\n')
-        cnt = cnt + 1
+            f3.writelines(tb + '<div class="' + class_str + '">\n')
         pre_col_num == element["col_num"]
 
+    # 2番目以降の要素か？
     else:
         if pre_col_num == element["col_num"]:
             print("col_num passed")
             pass
         else:
-            with open(filename_html, "a") as f3:
-                tb = tab_str(False)
-                f3.writelines(tb + '</div>\n')
-                tb = tab_str(True)
-                f3.writelines(tb + '<div class="col' + str(cnt) + '">\n')
-            cnt = cnt + 1
+            
+            # 次のdivに行くとき
+            if pre_col_num < element["col_num"]:
+                with open(filename_html, "a") as f3:
+                    class_list.pop(-1)
+                    tb = tab_str(False)
+                    f3.writelines(tb + '</div>\n')
+                    class_str = "col" + str(cnt)
+                    class_list.append(class_str)
+                    print(class_list)
+                    tb = tab_str(True)
+                    f3.writelines(tb + '<div class="' + class_str + '">\n')
         
         pre_col_num = element["col_num"]
 
@@ -474,28 +528,60 @@ for j in range(element_num):
             pass
         else:
             with open(filename_html, "a") as f3:
+                class_list.pop(-1)
+                print(class_list)
                 tb = tab_str(False)
                 f3.writelines(tb + '</div>\n')
+                class_list.pop(-1)
+                print(class_list)
+                tb = tab_str(False)
+                f3.writelines(tb + '</div>\n')
+                class_str = "div" + str(cnt)
+                class_list.append(class_str)
+                print(class_list)
                 tb = tab_str(True)
-                f3.writelines(tb + '<div class="div' + str(cnt) + '">\n')
-            cnt = cnt + 1
+                f3.writelines(tb + '<div class="' + class_str + '">\n')
         
         pre_div_num = element["div_num"]
 
 
     if element["block_type"] == "Image":
         with open(filename_html, "a") as f3:
+            class_str = "figure-area" + str(cnt)
+            class_list.append(class_str)
+            print(class_list)
             tb = tab_str(True)
-            f3.writelines(tb + '<div class="figure-area' + str(cnt) + '">\n')
+            f3.writelines(tb + '<div class="' + class_str + '">\n')
             tb = tab_str(True)
-            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(i) + '.jpg" alt="スマートフォン表示"></figure>\n')
+            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(j) + '.jpg" alt="スマートフォン表示"></figure>\n')
+            class_list.pop(-1)
+            print(class_list)
             tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
 
     elif element["block_type"] == "Text":
         with open(filename_html, "a") as f3:
+            class_str = "sentence-area" + str(cnt)
+            class_list.append(class_str)
+            print(class_list)
             tb = tab_str(True)
-            f3.writelines(tb +'<div class="sentence-area' + str(cnt) + '">\n')
+            f3.writelines(tb +'<div class="' + class_str + '">\n')
+
+            with open(filename_css, "a") as f2:
+                print("###### CSS output #######")
+                print(class_list)
+                print("###### CSS output #######")
+                css_str = "main"
+                for class_l in class_list[1:]:
+                    css_str = css_str + " ." + class_l
+                f2.writelines(css_str + "{\n")
+                f2.writelines("\t margin-top: 109px;\n")
+                f2.writelines("\t width: 100%;\n")
+                f2.writelines("\t color: " + element["color"] + ";\n")
+                f2.writelines("\t font-size: " + str(element["txt_size"]) + "px;\n")
+                f2.writelines("}\n")
+
+
 
             for k in element["block_list"]:
                 tb = tab_str(True)
@@ -506,29 +592,16 @@ for j in range(element_num):
                 f3.writelines(tb + '</div>\n')
                 print(jon_dat["compos"][k]["text_content"])
 
+            class_list.pop(-1)
+            print(class_list)
             tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
             
-    # CSS 入力   
-    with open(filename_css, "a") as f2:
-        f2.writelines(".sentence-area" + str(cnt) + "{\n")
-#                f2.writelines("position: absolute;\n" )
-#                f2.writelines("top:" + s_top + "px;\n" )
-#                f2.writelines("left:" + s_left + "px;\n" )
-#                f2.writelines("width:" + s_width + "px;\n" )
-#                f2.writelines("height:" + s_height + "px;\n" )
-#                color_str = "background: rgba(" + format(color[2]).zfill(3) + ","  + format(color[1]).zfill(3) + "," + format(color[0]).zfill(3) + ", 0.95 );\n"
-#                f2.writelines(color_str)
-#                f2.writelines("color: " + txt_color + ";\n")
-        f2.writelines("margin-top: " + str(d_height) + "px;\n")
-        f2.writelines("color: " + txt_color + ";\n")
-#                f2.writelines("color: green;\n")
-        f2.writelines("font-size: " + str(int(int(txt_height)*0.75)) + "px;\n")
-#                f2.writelines("z-index: " + str(z_index) + ";\n")
-        f2.writelines("}\n\n")
 
 
 with open(filename_html, "a") as f3:
+    class_list.pop(-1)
+    print(class_list)
     tb = tab_str(False)
     f3.writelines(tb + '</div>\n')
     tb = tab_str(False)
