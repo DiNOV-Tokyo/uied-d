@@ -16,6 +16,7 @@ filename_css = out_dir + "/" + filename + ".css"
 pic_dir = out_dir + "/" + filename + "_pic"
 rel_pic_dir = "./" + filename + "_pic"
 
+print("load json file : " + filename_json + "\n")
 
 if not os.path.exists(out_dir):
     # ディレクトリが存在しない場合、ディレクトリを作成する
@@ -35,6 +36,28 @@ element_cnt = 0
 
 
 
+################################################
+## オリジナルのjsonファイルを少々アレンジ　#######
+###############################################3
+
+def arrange_json(filename_json):
+
+    with open(filename_json, "r") as f:
+        jon_dat = json.load(f)
+
+        a = json.dumps(jon_dat)
+        element_num = a.count('"id":') -1
+        element_cnt = 0
+
+        for k in range(element_num):
+            if int(jon_dat["compos"][k]["height"]) > 150 and int(jon_dat["compos"][k]["width"]) > 150:
+                jon_dat["compos"][k]["class"] = "Image"
+
+    print(jon_dat)
+#    with open(filename_json, "w") as f0:
+#        f0.write(json.dumps(jon_dat))
+    with open(filename_json, mode='wt', encoding='utf-8') as f0:
+        json.dump(jon_dat, f0, ensure_ascii=False, indent=2)
 
 
 # htmlファイルのタブ数のカウント
@@ -282,11 +305,18 @@ def css_write(element, class_list):
 
 
 
+arrange_json(filename_json)
+
+
 next_div = False
 pre_row_min = 0
 pre_row_max = jon_dat["compos"][0]["position"]["row_max"]
 div_list = []
 
+print("element_num = " + str(element_num))
+############################################################################3333
+## 検出されたもの　テキスト、画像等　全て　を画像として保存　　　　　　　　　####
+###########################################################################3
 for i in range(element_num):
     x_c = int((int(jon_dat["compos"][i]["position"]["column_max"]) + int(jon_dat["compos"][i]["position"]["column_min"])) / 2 )
     y_c = int((int(jon_dat["compos"][i]["position"]["row_max"]) + int(jon_dat["compos"][i]["position"]["row_min"])) / 2 ) 
@@ -301,8 +331,12 @@ for i in range(element_num):
     
     img = cv2.imread(filename_img)
     img1 = img[row_top : row_bottom, col_left : col_right]
-    cv2.imwrite(pic_dir + "/out_sample1" + str(i) + ".jpg", img1)
+    cv2.imwrite(pic_dir + "/img" + str(i) + ".jpg", img1)
 
+
+###################################################################################
+######  element の block (div) をつくる　　　　                         ############
+####################################################################################
 
 # 連続した同じサイズのテキストの番号(id)のリスト
 txt_num_list = []
@@ -310,7 +344,6 @@ txt_num_list = []
 # JSONファイル内の最初に出てくるテキストかどうか
 txt_flg = True
 cnt = 0
-
 
 for i in range(element_num):
 
@@ -336,21 +369,21 @@ for i in range(element_num):
 
     # まずは、classがテキストの場合のみを考慮する。
     if jon_dat["compos"][i]["class"] == "Text":
-        print("txt")
+        print("txt  id = " + str(jon_dat["compos"][i]["id"]) + "class = " + jon_dat["compos"][i]["class"] )
 
         if txt_flg:
             pre_txt_height = jon_dat["compos"][i]["height"]
             txt_flg = False
-            print("pre_txt" + str(pre_txt_height))
+#            print("pre_txt" + str(pre_txt_height))
 
         txt_height = jon_dat["compos"][i]["height"]
         # ひとつ前のテキストとほぼ同じサイズなら、リストに番号を加える。
-        if abs(pre_txt_height - txt_height) < 5:
+        if abs(pre_txt_height - txt_height) < 6:
             txt_num_list.append(i)
 
         # ひとつ前のテキストと異なるサイズなら、１つ前までのテキストをhtmlファイルに書き出し。新たにリストを作る。
         else:
-            print(txt_num_list)
+#            print(txt_num_list)
 
             # テキストの文字色を求める。
             txt_color= text_color(i)
@@ -376,13 +409,90 @@ for i in range(element_num):
             txt_num_list.append(i)
             pre_txt_height = jon_dat["compos"][i]["height"]
 
+        if i == element_num-1:
+            # テキストの文字色を求める。
+            txt_color= text_color(i)
+
+            # テキストのサイズ
+            txt_size = jon_dat["compos"][i]["height"]
+
+            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size)
+            element_list.append(block_size_response)
+
 
         cnt = cnt+ 1
+
+print("Processed elements = " + str(i))
+
+#######################################################################################
+###     Elementを画面上で左上から右下に並ぶように並び替え                ################
+#######################################################################################
+
+a = json.dumps(element_list)
+element_num = a.count('block_num') 
+reordered_element_list = list(range(0, element_num))
+print("modify order")
+print(reordered_element_list)
+print(element_list)
+
+for element in element_list:
+    element_json = json.loads(element)
+    print(element_json)
+
+    same_div_list = []
+    if element_json["block_type"] == "Image":
+        print("image_block = " + str(element_json["block_num"]))
+        # 一旦、この要素の番号をリストから除外
+        reordered_element_list.remove(element_json["block_num"])
+        print(reordered_element_list)
+        # 同じ <div> にはいる文字ブロックを探す
+        for in_element in element_list:
+
+            in_element_json = json.loads(in_element)
+            if in_element_json["block_type"] == "Text":
+                # 文字ブロックの高さの中心を計算
+                in_element_height_center = (in_element_json["block_top"] + in_element_json["block_bottom"]) / 2
+
+                if in_element_height_center > element_json["block_top"] and in_element_height_center < element_json["block_bottom"]:
+                    # 文字ブロックは画像ブロックと同じ div にある。
+                    same_div_list.append(in_element_json["block_num"])
+
+        # 同じ div にあるテキストブロック
+        print("Text Block num in same div = ")
+        print(same_div_list)
+        reorder_flg = False
+        for same_div_list_num in same_div_list:
+            text_block = json.loads(element_list[same_div_list_num])
+
+            #今考えている画像ブロックの右端より、テキストブロックが右側にあるか？
+            if element_json["block_right"] < text_block["block_left"]:
+                print(text_block["block_num"])
+                # あったら、そのテキストブロックの前に画像ブロックが入るはず
+                # 要素番号をリストに挿入する
+                idx = reordered_element_list.index(same_div_list_num)
+                print("idx = " + str(idx))
+                reordered_element_list.insert(idx, element_json["block_num"])
+                print(reordered_element_list)
+                reorder_flg = True
+                break
+        if not reorder_flg:
+            reordered_element_list.insert(0, element_json["block_num"])
+
+print("======== Reordered Element List  ================")
+print(reordered_element_list)
+print("======== Reordered Element List  ================")
+
+element_list_reordered = []
+for n in reordered_element_list:
+    element_list_reordered.append(element_list[n])
+
+print(element_list_reordered)
+
 
 # Elementのレイアウトを検出
 # Element(block)の相互配置を確認しながらhtml/cssを書き出す。
 a = json.dumps(element_list)
-print(type(element_list))
+#print(type(element_list))
 element_num = a.count('block_num') 
 div_num = 0
 col_num = 0
@@ -391,32 +501,34 @@ element_1st_flg = True
 element_result = []
 
 for j in range(element_num):
-    print(j)
+    #print(j)
     if element_1st_flg:
-        element_list_chkd = json.loads(element_list[0])
+        element_list_chkd = json.loads(element_list_reordered[0])
         element_list_chkd["div_num"] = div_num
         element_list_chkd["col_num"] = col_num
         element_1st_flg = False
         element_result.append(element_list_chkd)
 
     else:
-        element_list_chkd_pre = json.loads(element_list[j-1])
-        element_list_chkd = json.loads(element_list[j])
-        block_center_x_pre = (element_list_chkd_pre["block_right"] + element_list_chkd_pre["block_left"]) / 2
-        block_center_y_pre = (element_list_chkd_pre["block_bottom"] + element_list_chkd_pre["block_top"]) / 2
+        element_list_chkd = json.loads(element_list_reordered[j])
+#        block_center_x_pre = (element_list_chkd_pre["block_right"] + element_list_chkd_pre["block_left"]) / 2
+        #block_center_y_pre = (element_list_chkd_pre["block_bottom"] + element_list_chkd_pre["block_top"]) / 2
         block_center_x = (element_list_chkd["block_right"] + element_list_chkd["block_left"]) / 2
         block_center_y = (element_list_chkd["block_bottom"] + element_list_chkd["block_top"]) / 2
 
+        print("id = " + str(j) + "  block_center_x = " + str(block_center_x) + "   block_center_x_pre = " + str(block_center_x_pre))
+        print("id = " + str(j) + "  element_list_chkd_pre[block_right]  = " + str(element_list_chkd_pre["block_right"] ) + "   element_list_chkd[block_left] = " + str(element_list_chkd["block_left"]))
         # レイアウトの検出
         # 左右か？
         if element_list_chkd_pre["block_right"] < element_list_chkd["block_left"]:
             # 左右並びになっている -> 次の列に移動
             col_num = col_num + 1
             element_list_chkd["col_num"] = col_num
+            element_list_chkd["div_num"] = div_num
             element_result.append(element_list_chkd)
         
         # 次のdivか？
-        elif block_center_x + 300 < block_center_x_pre and block_center_y > block_center_y_pre:
+        elif block_center_x < block_center_x_pre and block_center_y > block_center_y_pre:
             # 次のdiv
             col_num = 0
             div_num = div_num + 1
@@ -429,6 +541,12 @@ for j in range(element_num):
             element_list_chkd["div_num"] = div_num
             element_result.append(element_list_chkd)
 
+        print("############ Element result ################")
+        print(element_result)
+
+    element_list_chkd_pre = element_list_chkd
+    block_center_x_pre = (element_list_chkd_pre["block_right"] + element_list_chkd_pre["block_left"]) / 2
+    block_center_y_pre = (element_list_chkd_pre["block_bottom"] + element_list_chkd_pre["block_top"]) / 2
 
 #################################################
 # html / css の生成
@@ -442,8 +560,8 @@ pos = (20, 20)
 img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
 color = list(img[pos])
 color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
-print("color=" + str(color_str))
-print(element_num)
+#print("color=" + str(color_str))
+#print(element_num)
 class_list = []
 class_str = ""
 
@@ -462,17 +580,6 @@ with open(filename_html, "w") as f3:
     f3.writelines(tb + '<' + class_str +'>\n')
 
     
-with open(filename_css, "w") as f2:
-    f2.writelines("main .div1 {\n")
-    f2.writelines("\t width: 1000px;\n")
-    f2.writelines("\t margin: 0 auto;\n")
-    f2.writelines("\t display: -webkit-box;\n")
-    f2.writelines("\t display: -ms-flexbox;\n")
-    f2.writelines("\t display: flex;\n")
-    f2.writelines("\t -webkit-box-align: center;\n")
-    f2.writelines("\t -ms-flex-align: center;\n")
-    f2.writelines("\t align-items: center;\n")
-    f2.writelines("}\n")
 
 pre_div_num = 0
 pre_col_num = 0
@@ -482,14 +589,14 @@ for j in range(element_num):
     cnt = cnt + 1
 
     element = element_result[j]
-    print("col_num = " + str(element["col_num"]) + "  div_num:" + str(element["div_num"]) + "\n")
+#    print("col_num = " + str(element["col_num"]) + "  div_num:" + str(element["div_num"]) + "\n")
 
     # 最初の要素か？
     if j == 0:
         with open(filename_html, "a") as f3:
             class_str = "div" + str(cnt)
             class_list.append(class_str)
-            print(class_list)
+       #     print(class_list)
             tb = tab_str(True)
             f3.writelines(tb + '<div class="' + class_str + '">\n')
         pre_div_num == element["div_num"]
@@ -497,15 +604,28 @@ for j in range(element_num):
         with open(filename_html, "a") as f3:
             class_str = "col" + str(cnt)
             class_list.append(class_str)
-            print(class_list)
+      #      print(class_list)
             tb = tab_str(True)
             f3.writelines(tb + '<div class="' + class_str + '">\n')
         pre_col_num == element["col_num"]
 
+        with open(filename_css, "w") as f2:
+            f2.writelines("main .div1 {\n")
+            f2.writelines("\t width: 1000px;\n")
+            f2.writelines("\t margin: 0 auto;\n")
+            f2.writelines("\t display: -webkit-box;\n")
+            f2.writelines("\t display: -ms-flexbox;\n")
+            f2.writelines("\t display: flex;\n")
+            f2.writelines("\t -webkit-box-align: center;\n")
+            f2.writelines("\t -ms-flex-align: center;\n")
+            f2.writelines("\t align-items: center;\n")
+            f2.writelines("}\n")
+
+
     # 2番目以降の要素か？
     else:
         if pre_col_num == element["col_num"]:
-            print("col_num passed")
+     #       print("col_num passed")
             pass
         else:
             
@@ -517,31 +637,56 @@ for j in range(element_num):
                     f3.writelines(tb + '</div>\n')
                     class_str = "col" + str(cnt)
                     class_list.append(class_str)
-                    print(class_list)
+    #                print(class_list)
                     tb = tab_str(True)
                     f3.writelines(tb + '<div class="' + class_str + '">\n')
         
         pre_col_num = element["col_num"]
 
         if pre_div_num == element["div_num"]:
-            print("div_num passed")
+            #print("div_num passed")
             pass
         else:
+            # 新しい div に移るとき
             with open(filename_html, "a") as f3:
                 class_list.pop(-1)
-                print(class_list)
+   #             print(class_list)
                 tb = tab_str(False)
                 f3.writelines(tb + '</div>\n')
                 class_list.pop(-1)
-                print(class_list)
+  #              print(class_list)
                 tb = tab_str(False)
                 f3.writelines(tb + '</div>\n')
                 class_str = "div" + str(cnt)
                 class_list.append(class_str)
-                print(class_list)
+ #               print(class_list)
                 tb = tab_str(True)
                 f3.writelines(tb + '<div class="' + class_str + '">\n')
-        
+
+                class_str = "col" + str(cnt)
+                class_list.append(class_str)
+#                print(class_list)
+                tb = tab_str(True)
+                f3.writelines(tb + '<div class="' + class_str + '">\n')
+
+            with open(filename_css, "a") as f2:
+                css_str = "main"
+#                for class_l in class_list[1:]:
+                for class_l in class_list[1:2]:
+                    css_str = css_str + " ." + class_l
+                print(css_str)
+                f2.writelines(css_str + " {\n")
+                f2.writelines("\t width: 1000px;\n")
+                f2.writelines("\t margin: 0 auto;\n")
+                f2.writelines("\t display: -webkit-box;\n")
+                f2.writelines("\t display: -ms-flexbox;\n")
+                f2.writelines("\t display: flex;\n")
+                f2.writelines("\t -webkit-box-align: center;\n")
+                f2.writelines("\t -ms-flex-align: center;\n")
+                f2.writelines("\t align-items: center;\n")
+                f2.writelines("}\n")
+
+
         pre_div_num = element["div_num"]
 
 
@@ -549,13 +694,15 @@ for j in range(element_num):
         with open(filename_html, "a") as f3:
             class_str = "figure-area" + str(cnt)
             class_list.append(class_str)
-            print(class_list)
+#            print("#### Image " + str(j) + "#####")
+#            print(class_list)
             tb = tab_str(True)
             f3.writelines(tb + '<div class="' + class_str + '">\n')
+            img_num = element["block_list"][0]
             tb = tab_str(True)
-            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/out_sample1" + str(j) + '.jpg" alt="スマートフォン表示"></figure>\n')
+            f3.writelines(tb + '<figure class="pc"><img src="' + rel_pic_dir + "/img" + str(img_num) + '.jpg" alt="スマートフォン表示"></figure>\n')
             class_list.pop(-1)
-            print(class_list)
+#            print(class_list)
             tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
 
@@ -563,21 +710,22 @@ for j in range(element_num):
         with open(filename_html, "a") as f3:
             class_str = "sentence-area" + str(cnt)
             class_list.append(class_str)
-            print(class_list)
+            #print(class_list)
             tb = tab_str(True)
             f3.writelines(tb +'<div class="' + class_str + '">\n')
 
             with open(filename_css, "a") as f2:
-                print("###### CSS output #######")
-                print(class_list)
-                print("###### CSS output #######")
+                #print("###### CSS output #######")
+                #print(class_list)
+                #print("###### CSS output #######")
                 css_str = "main"
                 for class_l in class_list[1:]:
                     css_str = css_str + " ." + class_l
                 f2.writelines(css_str + "{\n")
                 f2.writelines("\t margin-top: 109px;\n")
                 f2.writelines("\t width: 100%;\n")
-                f2.writelines("\t color: " + element["color"] + ";\n")
+                f2.writelines("\t color: white;\n")
+#                f2.writelines("\t color: " + element["color"] + ";\n")
                 f2.writelines("\t font-size: " + str(element["txt_size"]) + "px;\n")
                 f2.writelines("}\n")
 
@@ -590,10 +738,10 @@ for j in range(element_num):
                 f3.writelines(tb + jon_dat["compos"][k]["text_content"] + '\n')
                 tb = tab_str(False)
                 f3.writelines(tb + '</div>\n')
-                print(jon_dat["compos"][k]["text_content"])
+#                print(jon_dat["compos"][k]["text_content"])
 
             class_list.pop(-1)
-            print(class_list)
+ #           print(class_list)
             tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
             
@@ -601,7 +749,7 @@ for j in range(element_num):
 
 with open(filename_html, "a") as f3:
     class_list.pop(-1)
-    print(class_list)
+    #print(class_list)
     tb = tab_str(False)
     f3.writelines(tb + '</div>\n')
     tb = tab_str(False)
@@ -612,4 +760,5 @@ with open(filename_html, "a") as f3:
     f3.writelines(tb + '</body>\n')
 
 print(element_list)
+print("\n")
 print(element_result)
