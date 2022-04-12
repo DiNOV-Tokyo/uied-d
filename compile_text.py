@@ -30,7 +30,7 @@ with open(filename_json, "r") as f:
     jon_dat = json.load(f)
 
 a = json.dumps(jon_dat)
-element_num = a.count('"id":') -1
+element_num = a.count('"id":')
 element_cnt = 0
 
 
@@ -41,12 +41,12 @@ element_cnt = 0
 ###############################################3
 
 def arrange_json(filename_json):
-
+    # 画像のサイズで　画像/画像ではない　を判別する。（簡易にするための一時的な処理）
     with open(filename_json, "r") as f:
         jon_dat = json.load(f)
 
         a = json.dumps(jon_dat)
-        element_num = a.count('"id":') -1
+        element_num = a.count('"id":')
         element_cnt = 0
 
         for k in range(element_num):
@@ -125,7 +125,7 @@ def block_size(block_num, block_type, block_list, color, txt_size):
         "block_bottom": block_bottom, 
         "block_list": block_list,
         "color": color,
-        "txt_size": txt_size,
+        "txt_size": int(txt_size * 0.6),
         "div_num": 0,
         "col_num": 0,
         }
@@ -304,8 +304,15 @@ def css_write(element, class_list):
         f2.writelines("}\n\n")
 
 
-
+# ファイルを修正 -> 読込
 arrange_json(filename_json)
+
+with open(filename_json, "r") as f:
+    jon_dat = json.load(f)
+
+a = json.dumps(jon_dat)
+element_num = a.count('"id":')
+element_cnt = 0
 
 
 next_div = False
@@ -347,11 +354,12 @@ cnt = 0
 
 for i in range(element_num):
 
-    next_min = jon_dat["compos"][i+1]["position"]["row_min"]
-    now_min = jon_dat["compos"][i]["position"]["row_min"]
-    now_height = jon_dat["compos"][i]["height"]
+#    next_min = jon_dat["compos"][i+1]["position"]["row_min"]
+#    now_min = jon_dat["compos"][i]["position"]["row_min"]
+#    now_height = jon_dat["compos"][i]["height"]
 
 
+    # classが画像の場合
     if jon_dat["compos"][i]["class"] == "Image":
 
         a_color = area_color(i)
@@ -365,9 +373,7 @@ for i in range(element_num):
         element_cnt = element_cnt + 1
 
 
-
-
-    # まずは、classがテキストの場合のみを考慮する。
+    # classがテキストの場合
     if jon_dat["compos"][i]["class"] == "Text":
         print("txt  id = " + str(jon_dat["compos"][i]["id"]) + "class = " + jon_dat["compos"][i]["class"] )
 
@@ -386,10 +392,10 @@ for i in range(element_num):
 #            print(txt_num_list)
 
             # テキストの文字色を求める。
-            txt_color= text_color(i)
+            txt_color= text_color(i-1)
 
             # テキストのサイズ
-            txt_size = jon_dat["compos"][i]["height"]
+            txt_size = jon_dat["compos"][i-1]["height"]
 
             block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size)
             element_list.append(block_size_response)
@@ -407,7 +413,9 @@ for i in range(element_num):
 
             txt_num_list = []
             txt_num_list.append(i)
+
             pre_txt_height = jon_dat["compos"][i]["height"]
+
 
         if i == element_num-1:
             # テキストの文字色を求める。
@@ -475,8 +483,9 @@ for element in element_list:
                 print(reordered_element_list)
                 reorder_flg = True
                 break
+
         if not reorder_flg:
-            reordered_element_list.insert(0, element_json["block_num"])
+            reordered_element_list.append(element_json["block_num"])
 
 print("======== Reordered Element List  ================")
 print(reordered_element_list)
@@ -724,8 +733,8 @@ for j in range(element_num):
                 f2.writelines(css_str + "{\n")
                 f2.writelines("\t margin-top: 109px;\n")
                 f2.writelines("\t width: 100%;\n")
-                f2.writelines("\t color: white;\n")
-#                f2.writelines("\t color: " + element["color"] + ";\n")
+#                f2.writelines("\t color: white;\n")
+                f2.writelines("\t color: " + element["color"] + ";\n")
                 f2.writelines("\t font-size: " + str(element["txt_size"]) + "px;\n")
                 f2.writelines("}\n")
 
