@@ -49,15 +49,32 @@ def arrange_json(filename_json):
         element_num = a.count('"id":')
         element_cnt = 0
 
+        arranged_element = []
+        # 一旦、大きさが250以上の検出物のみをImageとする。
+        # Image, Text のみをデータとして保存
         for k in range(element_num):
             if int(jon_dat["compos"][k]["height"]) > 150 and int(jon_dat["compos"][k]["width"]) > 150:
+                # もしchildrenがいたら、そのchildrenはImageとしない。
+                if "children" in jon_dat["compos"][k]:
+                    for children_num in jon_dat["compos"][k]["children"]:
+                        jon_dat["compos"][children_num]["height"] = 10
+                        jon_dat["compos"][children_num]["width"] = 10
+                        print(jon_dat["compos"][k]["children"])
+
                 jon_dat["compos"][k]["class"] = "Image"
+                arranged_element.append(jon_dat["compos"][k])
+
+            if jon_dat["compos"][k]["class"] == "Text":
+                arranged_element.append(jon_dat["compos"][k])
+
+    result = {"compos": arranged_element}
 
     print(jon_dat)
 #    with open(filename_json, "w") as f0:
 #        f0.write(json.dumps(jon_dat))
     with open(filename_json, mode='wt', encoding='utf-8') as f0:
-        json.dump(jon_dat, f0, ensure_ascii=False, indent=2)
+        json.dump(result, f0, ensure_ascii=False, indent=2)
+#        json.dump(jon_dat, f0, ensure_ascii=False, indent=2)
 
 
 # htmlファイルのタブ数のカウント
@@ -96,7 +113,7 @@ def tab_str(next_ui):
 element_list = []
 
 # ブロックのサイズを取得・保存
-def block_size(block_num, block_type, block_list, color, txt_size):
+def block_size(block_num, block_type, block_list, color, txt_size, padding):
     first_block = True
     for block in block_list:
         if first_block:
@@ -126,6 +143,7 @@ def block_size(block_num, block_type, block_list, color, txt_size):
         "block_list": block_list,
         "color": color,
         "txt_size": int(txt_size * 0.6),
+        "padding": padding,
         "div_num": 0,
         "col_num": 0,
         }
@@ -368,7 +386,9 @@ for i in range(element_num):
         # テキストのサイズ （これは意味がないが、テキストのリストの情報と併せるため）
         txt_size = jon_dat["compos"][i]["height"]
 
-        block_size_response = block_size(element_cnt, "Image", img_num_list, a_color, txt_size)
+        padding = 0
+
+        block_size_response = block_size(element_cnt, "Image", img_num_list, a_color, txt_size, padding)
         element_list.append(block_size_response)
         element_cnt = element_cnt + 1
 
@@ -397,19 +417,18 @@ for i in range(element_num):
             # テキストのサイズ
             txt_size = jon_dat["compos"][i-1]["height"]
 
-            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size)
-            element_list.append(block_size_response)
-            element_cnt = element_cnt + 1
-
             # 前のリストの最後の文字列と、今回のリストの最初の文字列との間隔を求める。
             # 前のリストの最後の文字列の番号
             last_txt_num = int(txt_num_list[0]) - 1
             # 今回のリストの最初の文字列の番号
             first_txt_num = int(txt_num_list[0])
-            d_height = int(jon_dat["compos"][first_txt_num]["position"]["row_min"]) - int(jon_dat["compos"][last_txt_num]["position"]["row_max"])
-            if d_height <  0:
-                d_height = 0
+            padding = int(jon_dat["compos"][first_txt_num]["position"]["row_min"]) - int(jon_dat["compos"][last_txt_num]["position"]["row_max"])
+            if padding <  0:
+                padding = 0
 
+            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size, padding)
+            element_list.append(block_size_response)
+            element_cnt = element_cnt + 1
 
             txt_num_list = []
             txt_num_list.append(i)
@@ -424,7 +443,9 @@ for i in range(element_num):
             # テキストのサイズ
             txt_size = jon_dat["compos"][i]["height"]
 
-            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size)
+            padding = 0
+
+            block_size_response = block_size(element_cnt, "Text", txt_num_list, txt_color, txt_size, padding)
             element_list.append(block_size_response)
 
 
@@ -484,8 +505,11 @@ for element in element_list:
                 reorder_flg = True
                 break
 
+        idx = reordered_element_list.index(same_div_list_num)
+
         if not reorder_flg:
-            reordered_element_list.append(element_json["block_num"])
+            reordered_element_list.insert(idx+1, element_json["block_num"])
+#            reordered_element_list.append(element_json["block_num"])
 
 print("======== Reordered Element List  ================")
 print(reordered_element_list)
@@ -620,7 +644,7 @@ for j in range(element_num):
 
         with open(filename_css, "w") as f2:
             f2.writelines("main .div1 {\n")
-            f2.writelines("\t width: 1000px;\n")
+            f2.writelines("\t width: 1400px;\n")
             f2.writelines("\t margin: 0 auto;\n")
             f2.writelines("\t display: -webkit-box;\n")
             f2.writelines("\t display: -ms-flexbox;\n")
@@ -731,7 +755,8 @@ for j in range(element_num):
                 for class_l in class_list[1:]:
                     css_str = css_str + " ." + class_l
                 f2.writelines(css_str + "{\n")
-                f2.writelines("\t margin-top: 109px;\n")
+                f2.writelines("\t margin-top: " + str(element["padding"]) +  "px;\n")
+#                f2.writelines("\t margin-top: 109px;\n")
                 f2.writelines("\t width: 100%;\n")
 #                f2.writelines("\t color: white;\n")
                 f2.writelines("\t color: " + element["color"] + ";\n")
