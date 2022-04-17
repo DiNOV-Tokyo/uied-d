@@ -67,7 +67,10 @@ def arrange_json(filename_json):
             if jon_dat["compos"][k]["class"] == "Text":
                 arranged_element.append(jon_dat["compos"][k])
 
-    result = {"compos": arranged_element}
+    result = {
+        "compos": arranged_element,
+        "img_shape": jon_dat["img_shape"],
+        }
 
     print(jon_dat)
 #    with open(filename_json, "w") as f0:
