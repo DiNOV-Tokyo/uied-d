@@ -25,6 +25,8 @@ $ python run_single.py **
 
 ### 3. JSON->HTML/CSS変換
 
+#### 旧バージョン
+
 ```python
 $ python compile_merge_img.py **
 ```
@@ -32,4 +34,10 @@ $ python compile_merge_img.py **
 
 - ./data/output/ip or merge or ocr 以下に結果が保存される。
 
+#### 新規開発バージョン
 
+```python
+$ python compile_text.py **
+```
+** は読み込むファイル名（拡張子を除く）
+(テキスト、画像を含めて変換される。)
