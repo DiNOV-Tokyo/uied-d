@@ -357,7 +357,8 @@ for i in range(element_num):
 print("#########             element の block (div) をつくる                  ###########")
 # JSONファイル内のコンテントのリスト　（最初に全コンテントを登録しておき、検出済みのものから削除していく）
 content_list = list(range(element_num))
-
+print("element_list")
+print(content_list)
 # 連続した同じサイズのテキストの番号(id)のリスト
 txt_num_list = []
 
@@ -367,7 +368,7 @@ cnt = 0
 
 for i in range(element_num):
 
-    # classが画像の場合
+    # classが画像の場合 : １つの要素とする
     if jon_dat["compos"][i]["class"] == "Image":
 
         a_color = area_color(i)
@@ -393,22 +394,35 @@ for i in range(element_num):
 
             pre_txt_height = jon_dat["compos"][i]["height"]
             pre_txt_row_min = jon_dat["compos"][i]["position"]["row_min"]
+            pre_txt_row_max = jon_dat["compos"][i]["position"]["row_max"]
             pre_txt_column_min = jon_dat["compos"][i]["position"]["column_min"]
-
+            print(content_list)
             # リストにあるコンテントを全スキャン
             # 同じブロックに入れるべきか判断する
             for j in content_list:
+                print("start content list")
+                print(content_list)
 
                 txt_height = jon_dat["compos"][j]["height"]
                 txt_row_min = jon_dat["compos"][j]["position"]["row_min"]
+                txt_row_max = jon_dat["compos"][j]["position"]["row_max"]
                 txt_column_min = jon_dat["compos"][j]["position"]["column_min"]
-
+                print("No." + str(j) + "    pre_txt_row_min : " + str(pre_txt_row_min) + "   txt_row_min : " + str(txt_row_min))
                 # 検討中のテキストとほぼ同じサイズ、なおかつ、大きく離れていないなら、リストに番号を加える。（= 同じブロック内にあるとみなす。）
-                if abs(pre_txt_height - txt_height) < 4 and abs(pre_txt_row_min - txt_row_min) < 100 and abs(pre_txt_column_min - txt_column_min) < 100:
+                if abs(pre_txt_height - txt_height) < 7 and abs(pre_txt_row_min - txt_row_min) < 100 and abs(pre_txt_column_min - txt_column_min) < 100:
+#                if abs(pre_txt_height - txt_height) < 4 and abs(pre_txt_row_min - txt_row_min) < 100 and abs(pre_txt_column_min - txt_column_min) < 100:
+                    print("No." + str(i) + "  append " + str(j) )
                     # 同じブロックのリストに加える
                     txt_num_list.append(j)
                     # 検討するコンテントリストから除外する
                     content_list.remove(j)
+                    print("after remove")
+                    print(content_list)
+                    pre_txt_height = jon_dat["compos"][j]["height"]
+                    pre_txt_row_min = jon_dat["compos"][j]["position"]["row_min"]
+                    pre_txt_row_max = jon_dat["compos"][j]["position"]["row_max"]
+                    pre_txt_column_min = jon_dat["compos"][j]["position"]["column_min"]
+
 
             # テキストの文字色を求める。
             txt_color= text_color(i)
@@ -437,7 +451,9 @@ for i in range(element_num):
             if content_list == []:
                 break
 
+
 print("block_num = " + str(cnt+1))
+print(element_list)
 
 print("==================     Blockを画面上で左上から右下に並ぶように並び替え       ==================")
 
@@ -458,60 +474,183 @@ block_layout = []
 first_element_flg = True
 for element in element_list:
 
+    next_loop_flg = False
     element_json = json.loads(element)
 
-    print("block = " + str(element_json["block_num"]))
+    cnt = len(block_layout)
+    print("========================================================================================")
+    print("block = " + str(element_json["block_num"]) + "  Scan START : cnt = " + str(cnt))
+    # 一番最初のエレメントをまずリストに加える。
     if first_element_flg:
         block_layout.append(element_json["block_num"])
         first_element_flg = False
 
     else:
-        # 今検証中のブロックが、スキャンしたブロックに対してどちらがわにあるか？のフラッグ
-        cnt = er.list_count(block_layout)
+#        cnt = len(block_layout)
         idx = element_json["block_num"]
         cnt_tmp = 0
         not_in_list_flg = False
         not_in_same_row_flg = True
         in_same_row_flg = False
 
+
         for block_num0 in block_layout:
             print(block_num0)
-            # 同じrow内で、どのcolに入るか調べる
+
             block_num0_idx = block_layout.index(block_num0)
+            # 同じrow内で、どのcolに入るか調べる
             if isinstance(block_num0, list):
-                block_list_send = block_num0
+                
+                cnt_tmp1 = 0
+                cnt1 = er.list_count(block_num0)
+                print("Show block")
+                print(block_num0)
+                print(type(block_num0))
+
+                # リストの中にリストがあるか？　あれば、もう一回リストに入って作業
+                if er.isNextList(block_num0):
+                    # 入れ子リストのカウンター
+                    in_cnt = 0
+                    for block_num1 in block_num0:
+
+                        print(block_num0)
+                        if isinstance(block_num1, list):
+                            print("Deepest-LIST SCAN START")
+                            block_list_send = block_num1
+                            block_num1_idx = block_num0.index(block_num1)
+
+                            block_list_return, in_same_row_flg, in_same_col_flg = er.list_reorder(idx, block_list_send, element_list)
+                            cnt_tmp1 = cnt_tmp1 + 1
+                            cnt_tmp = cnt_tmp + 1
+                            in_cnt = in_cnt + 1
+
+                            if in_same_row_flg:
+                                not_in_same_row_flg = False
+
+                            if block_list_send == block_list_return:
+                                if idx not in block_list_send:
+                                    not_in_list_flg = True
+                                else:
+                                    not_in_list_flg = False
+                                print("PASS")
+                                pass
+                            else:
+                                next_loop_flg = True
+                                block_num0.remove(block_num1)
+                                block_num0.insert(block_num1_idx, block_list_return)
+                                print(block_layout)
+                                break
+                            print("Deepest-LIST SCAN END")
+
+                    # 同じrowでリストの最後につける
+                    if not_in_list_flg and cnt_tmp1 == cnt1 and in_same_col_flg:
+                        #cnt_tmp = cnt_tmp + 1
+                        next_loop_flg = True
+                        block_num0.append(idx)
+                        break
+
+                else:
+                    print("NOT Deepest-LIST SCAN START")
+
+                    block_list_send = block_num0
+
+                    block_list_return, in_same_row_flg, in_same_col_flg = er.list_reorder(idx, block_list_send, element_list)
+                    print("block_list_return : " + str(idx) + "    in_same_row_flg :" + str(in_same_row_flg) + "    in_same_col_flg : " + str(in_same_col_flg))
+                    cnt_tmp = cnt_tmp + 1
+
+                    if in_same_row_flg:
+                        not_in_same_row_flg = False
+
+                    block_layout.remove(block_num0)
+                    block_layout.insert(block_num0_idx, block_list_return)
+
+
+                    print("HHHHHHHHH")
+                    print(block_layout)
+                    if block_list_send == block_list_return:
+                        if idx not in block_list_send:
+                            not_in_list_flg = True
+                        else:
+                            not_in_list_flg = False
+                        pass
+                    else:
+                        next_loop_flg = True
+                        not_in_list_flg = False
+                        break
+
+                print("block_layout")
+                if next_loop_flg:
+#                    next_loop_flg = False
+                    break
+
             else:
                 block_list_send = [block_num0]
 
-            block_list_return, in_same_row_flg = er.list_reorder(idx, block_list_send, element_list)
+                block_list_return, in_same_row_flg, in_same_col_flg = er.list_reorder(idx, block_list_send, element_list)
+                cnt_tmp = cnt_tmp + 1
 
-            if in_same_row_flg:
-                not_in_same_row_flg = False
+                if in_same_row_flg:
+                    not_in_same_row_flg = False
 
-            block_layout.remove(block_num0)
-            block_layout.insert(block_num0_idx, block_list_return)
+                block_layout.remove(block_num0)
+                block_layout.insert(block_num0_idx, block_list_return)
 
-            cnt_tmp = cnt_tmp + 1
 
-            if block_list_send == block_list_return:
-                if idx not in block_list_send:
-                    not_in_list_flg = True
+                if block_list_send == block_list_return:
+                    if idx not in block_list_send:
+                        not_in_list_flg = True
+                    else:
+                        not_in_list_flg = False
+                    pass
                 else:
                     not_in_list_flg = False
-                pass
-            else:
-                break
+                    break
 
+#            if next_loop_flg:
+#3                next_loop_flg = False
+#                break
+
+#        print("block_layout")
+#        if next_loop_flg:
+#            next_loop_flg = False
+#            break
+
+        print("idx = " + str(idx) + "  not_in_list_flg = " + str(not_in_list_flg) + "   cnt_tmp = " + str(cnt_tmp) + "  cnt = " + str(cnt))
         # 同じrowでリストの最後につける
-        if not_in_list_flg and cnt_tmp == cnt:
+        if not_in_list_flg and cnt_tmp >= cnt and not er.isInList(block_layout, idx):
+#        if not_in_list_flg and cnt_tmp == cnt:
+            print(block_layout)
 
+            # 同じrowにあるとき
             if not not_in_same_row_flg:
-                block_layout.append(idx)
+                print("[end] Same row")
+                #cnt_tmp = cnt_tmp + 1
+                #block_layout.append([idx])
+                if len(block_layout) == 1:
+                    block_layout.append([idx])
+                else:
+                    # block_layoutの形で次のレイアウトがきまる。
+                    # [[*], [*]],[*] の時、[[*], [*]],[[*],[*]] にしたい。
+                    # [*], [*], [*] の時、[*], [*], [*], [*] にしたい。
+                    
+                    least_2_block = str(block_layout[len(block_layout)-2])
+                    print(least_2_block)
+                    if ']]' in least_2_block:
+                        print("LEAST 2 Block")
+                        least_block = block_layout[len(block_layout)-1]
+                        print(least_block)
+                        block_layout.remove(least_block)
+                        print(block_layout)
+                        block_layout.append([least_block, [idx]])
+                    else:
+                        print("Simple append")
+                        block_layout.append([idx])
             else:
-                # 次のrowに行くべきか調べる
-                print("Different row")
-                block_layout = [block_layout, block_list_send]
+                # 次のrowに行くとき
+                print("[end] Different row")
+                block_layout = [block_layout, [idx]]
 
+    print("idx = " + str(element_json["block_num"]))
     print(block_layout)
 
 print("=======================   Reordered Block List    ====================")
@@ -525,12 +664,23 @@ cnt = 0
 for k in block_layout:
     if isinstance(k, list):
         for m in k:
-            element_json = json.loads(element_list[m])
-            element_json["block_num"] = cnt
-            element_json["div_num"] = div_num
-            element_json["col_num"] = col_num
-            element_result.append(element_json)
-            cnt = cnt + 1
+            if isinstance(m, list):
+                for n in m:
+                    element_json = json.loads(element_list[n])
+                    element_json["block_num"] = cnt
+                    element_json["div_num"] = div_num
+                    element_json["col_num"] = col_num
+                    element_result.append(element_json)
+                    cnt = cnt + 1
+                col_num = col_num + 1
+
+            else:
+                element_json = json.loads(element_list[m])
+                element_json["block_num"] = cnt
+                element_json["div_num"] = div_num
+                element_json["col_num"] = col_num
+                element_result.append(element_json)
+                cnt = cnt + 1
 
     else:
         element_json = json.loads(element_list[k])
@@ -540,7 +690,7 @@ for k in block_layout:
         element_result.append(element_json)
         cnt = cnt + 1
 
-    col_num = col_num + 1
+    div_num = div_num + 1
 
 
 print("=================      # html / css の生成      ======================")
@@ -564,7 +714,7 @@ with open(filename_html, "w") as f3:
     f3.writelines('<title>タイトル</title>\n')
     f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
     f3.writelines('</head>\n')
-    f3.writelines('<body bgcolor="' + color_str + '">\n')
+    f3.writelines('<body>\n')
     class_str = "main"
     class_list.append(class_str)
     tb = tab_str(True)
@@ -600,6 +750,12 @@ for j in range(element_num):
         pre_col_num == element["col_num"]
 
         with open(filename_css, "w") as f2:
+            f2.writelines('/*** The new CSS reset - version 1.5.1 (last updated 1.3.2022) ***/ \n')
+            f2.writelines('*:where(:not(iframe,canvas,img,svg,video):not(svg *,symbol *)){all:unset;display:revert}*,*::before,*::after{box-sizing:border-box}a,button{cursor:revert}ol,ul,menu{list-style:none}img{max-width:100%}table{border-collapse:collapse}textarea{white-space:revert}meter{-webkit-appearance:revert;appearance:revert}::placeholder{color:unset}:where([hidden]){display:none}:where([contenteditable]){-moz-user-modify:read-write;-webkit-user-modify:read-write;overflow-wrap:break-word;-webkit-line-break:after-white-space}:where([draggable="true"]){-webkit-user-drag:element}\n')
+            f2.writelines("body {\n")
+            f2.writelines("\t background-color: " + color_str + "\n")
+            f2.writelines("}\n")
+            
             f2.writelines("main .div1 {\n")
             f2.writelines("\t width: 1400px;\n")
             f2.writelines("\t margin: 0 auto;\n")
@@ -726,6 +882,6 @@ with open(filename_html, "a") as f3:
     tb = tab_str(False)
     f3.writelines(tb + '</body>\n')
 
-print(element_list)
+#print(element_list)
 #print("\n")
 #print(element_result)
