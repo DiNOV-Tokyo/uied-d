@@ -396,33 +396,29 @@ for i in range(element_num):
             pre_txt_row_min = jon_dat["compos"][i]["position"]["row_min"]
             pre_txt_row_max = jon_dat["compos"][i]["position"]["row_max"]
             pre_txt_column_min = jon_dat["compos"][i]["position"]["column_min"]
-            print(content_list)
+
             # リストにあるコンテントを全スキャン
             # 同じブロックに入れるべきか判断する
             for j in content_list:
-                print("start content list")
-                print(content_list)
 
                 txt_height = jon_dat["compos"][j]["height"]
                 txt_row_min = jon_dat["compos"][j]["position"]["row_min"]
                 txt_row_max = jon_dat["compos"][j]["position"]["row_max"]
                 txt_column_min = jon_dat["compos"][j]["position"]["column_min"]
-                print("No." + str(j) + "    pre_txt_row_min : " + str(pre_txt_row_min) + "   txt_row_min : " + str(txt_row_min))
+
                 # 検討中のテキストとほぼ同じサイズ、なおかつ、大きく離れていないなら、リストに番号を加える。（= 同じブロック内にあるとみなす。）
-                if abs(pre_txt_height - txt_height) < 7 and abs(pre_txt_row_min - txt_row_min) < 100 and abs(pre_txt_column_min - txt_column_min) < 100:
-#                if abs(pre_txt_height - txt_height) < 4 and abs(pre_txt_row_min - txt_row_min) < 100 and abs(pre_txt_column_min - txt_column_min) < 100:
-                    print("No." + str(i) + "  append " + str(j) )
+                if abs(pre_txt_height - txt_height) < 7 and abs(pre_txt_row_min - txt_row_min) < 70 and abs(pre_txt_column_min - txt_column_min) < 70:
                     # 同じブロックのリストに加える
                     txt_num_list.append(j)
-                    # 検討するコンテントリストから除外する
-                    content_list.remove(j)
-                    print("after remove")
-                    print(content_list)
                     pre_txt_height = jon_dat["compos"][j]["height"]
                     pre_txt_row_min = jon_dat["compos"][j]["position"]["row_min"]
                     pre_txt_row_max = jon_dat["compos"][j]["position"]["row_max"]
                     pre_txt_column_min = jon_dat["compos"][j]["position"]["column_min"]
 
+            # 検討するリスト（content_list）から、ブロックに加えたリストの要素を削除
+            for k in txt_num_list:
+                if k in content_list:
+                    content_list.remove(k)
 
             # テキストの文字色を求める。
             txt_color= text_color(i)
@@ -446,13 +442,13 @@ for i in range(element_num):
 
             txt_num_list = []
 
-            cnt = cnt+ 1
+            cnt = cnt + 1
 
             if content_list == []:
                 break
 
 
-print("block_num = " + str(cnt+1))
+print("block_num = " + str(cnt-1))
 print(element_list)
 
 print("==================     Blockを画面上で左上から右下に並ぶように並び替え       ==================")
