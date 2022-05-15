@@ -42,21 +42,30 @@ def list_reorder(idx, comp_list, all_block):
 
         block_in_json = json.loads(all_block[i])
 
+        # 同じcolumnに入っているか？
         if abs(block_in_json["block_left"] - block_idx_json["block_left"]) < 150:
-            print(comp_list)
-            print("idx = " + str(idx))
+
             in_same_col_flg = True
             # 同じcolumnに入っている -> 順番を検出
             if block_in_json["block_top"] > block_idx_json["block_bottom"] and abs(block_in_json["block_top"] - block_idx_json["block_bottom"]) < 100:
                 # 調査中のブロックが、ループを回して走査しているブロックより前にある
                 result_list.append(idx)
                 result_list.append(i)
+#            else:
+                # 調査中のブロックが、ループを回して走査しているブロックより後ろにある
+#                result_list.append(i)
+#                result_list.append(idx)
+
                 in_list_flg = True
 
+        print("in_list_flg = " + str(in_list_flg))
         if not in_list_flg:
             # まだリストに入れていない　＝　同じColumnにあって、調査中のブロックが、ループを回して走査しているブロックより後ろにある
             result_list.append(i)
+            print("add to result_list")
+            print(result_list)
 
+        print(result_list)
         print("Top check : " + str(block_in_json["block_num"] ) + " of " + str(block_in_json["block_top"]) + "   and  " + str(block_idx_json["block_num"]) + "  of " + str(block_idx_json["block_top"]))
         # 同じrowにあるかチェック
         # if abs(block_in_json["block_top"] - block_idx_json["block_top"]) < 50:
@@ -69,8 +78,9 @@ def list_reorder(idx, comp_list, all_block):
     #　同じColumnにあるか？
     if abs(block_in_json["block_left"] - block_idx_json["block_left"]) < 100:
         # 同じcolumnに入っている -> 順番を検出
-        if block_in_json["block_bottom"] < block_idx_json["block_top"] and abs(block_in_json["block_bottom"] - block_idx_json["block_top"]) < 60:
+        if block_in_json["block_bottom"] < block_idx_json["block_top"] and abs(block_in_json["block_bottom"] - block_idx_json["block_top"]) < 80:
             # block_in より後ろにある。
+            print("same col, append last")
             if not in_list_flg:
                 result_list.append(idx)
 
