@@ -6,6 +6,7 @@ import collections
 import pickle
 import element_reorder as er
 import element_layout as el
+import element_arrange as ea
 
 args = sys.argv
 # filename without extension
@@ -30,47 +31,6 @@ if not os.path.exists(pic_dir):
     # ディレクトリが存在しない場合、ディレクトリを作成する
     os.makedirs(pic_dir)
 
-
-def arrange_json(filename_json):
-    print("#########     オリジナルのjsonファイルを少々アレンジ Arrange Json       ###########")
-    # 画像のサイズで　画像/画像ではない　を判別する。（簡易にするための一時的な処理）
-    with open(filename_json, "r") as f:
-        jon_dat = json.load(f)
-
-        a = json.dumps(jon_dat)
-        element_num = a.count('"id":')
-        element_cnt = 0
-
-        arranged_element = []
-        # 一旦、大きさが250以上の検出物のみをImageとする。
-        # Image, Text のみをデータとして保存
-        for k in range(element_num):
-            if int(jon_dat["compos"][k]["height"]) > 250 and int(jon_dat["compos"][k]["width"]) > 250:
-                # もしchildrenがいたら、そのchildrenはImageとしない。
-                if "children" in jon_dat["compos"][k]:
-                    for children_num in jon_dat["compos"][k]["children"]:
-                        jon_dat["compos"][children_num]["height"] = 10
-                        jon_dat["compos"][children_num]["width"] = 10
-                        jon_dat["compos"][children_num]["class"] = "Nan"
-                    jon_dat["compos"][k]["children"] = []
-
-                jon_dat["compos"][k]["class"] = "Image"
-                jon_dat["compos"][k]["id"] = element_cnt
-                arranged_element.append(jon_dat["compos"][k])
-                element_cnt = element_cnt + 1
-
-            if jon_dat["compos"][k]["class"] == "Text":
-                jon_dat["compos"][k]["id"] = element_cnt
-                arranged_element.append(jon_dat["compos"][k])
-                element_cnt = element_cnt + 1
-
-    result = {
-        "compos": arranged_element,
-        "img_shape": jon_dat["img_shape"],
-        }
-
-    with open(filename_json, mode='wt', encoding='utf-8') as f0:
-        json.dump(result, f0, ensure_ascii=False, indent=2)
 
 
 # htmlファイルのタブ数のカウント
@@ -317,7 +277,7 @@ def css_write(element, class_list):
 element_list = []
 
 # JSONファイルを修正
-arrange_json(filename_json)
+ea.arrange_json(filename_json)
 
 # JSONファイルを読込
 with open(filename_json, "r") as f:
@@ -454,13 +414,6 @@ print(element_list)
 
 print("==================     Blockを画面上で左上から右下に並ぶように並び替え       ==================")
 
-# UIブロックの配置をリストで表現
-# ブロック番号をリストの要素にして、リストの構成をそのまま、div, colで表現
-# [[1,2],[3,4]],[5,6]
-# 1と2、3と4は同じColumn。[1,2]と[3,4]、[5,6]は同じdiv
-
-#with open(filename_element_json, mode='wt', encoding='utf-8') as fe:
-#        fe.writelines(element_list)
 
 with open(filename_element_json, mode='wt', encoding='utf-8') as fe:
     json.dump(element_list, fe, ensure_ascii=False, indent=2)
@@ -478,7 +431,10 @@ col_num = 0
 element_result = []
 cnt = 0
 for k in block_layout:
+    print(k)
     if isinstance(k, list):
+        print("List")
+        print(k)
         for m in k:
             if isinstance(m, list):
                 for n in m:
@@ -499,6 +455,8 @@ for k in block_layout:
                 cnt = cnt + 1
 
     else:
+        print("Non-List")
+        print(k)
         element_json = json.loads(element_list[k])
         element_json["block_num"] = cnt
         element_json["div_num"] = div_num
