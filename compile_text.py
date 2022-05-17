@@ -430,6 +430,7 @@ div_num = 0
 col_num = 0
 element_result = []
 cnt = 0
+print("len block = " + str(len(block_layout)))
 for k in block_layout:
     print(k)
     if isinstance(k, list):
@@ -444,7 +445,8 @@ for k in block_layout:
                     element_json["col_num"] = col_num
                     element_result.append(element_json)
                     cnt = cnt + 1
-                col_num = col_num + 1
+#                col_num = col_num + 1
+                print("In deep col")
 
             else:
                 element_json = json.loads(element_list[m])
@@ -453,7 +455,11 @@ for k in block_layout:
                 element_json["col_num"] = col_num
                 element_result.append(element_json)
                 cnt = cnt + 1
+                print("In deep col 2")
+            col_num = col_num + 1
 
+        print("div=" + str(div_num) + "  col=" + str(col_num))
+        print(k)
     else:
         print("Non-List")
         print(k)
@@ -464,13 +470,17 @@ for k in block_layout:
         element_result.append(element_json)
         cnt = cnt + 1
 
+        print("div=" + str(div_num) + "  col=" + str(col_num))
+        print(k)
+
     div_num = div_num + 1
+    col_num = 0
 
 
 with open(filename_element_json, mode='wt', encoding='utf-8') as fe:
     json.dump(element_result, fe, ensure_ascii=False, indent=2)
 
-
+print(element_result)
 print("=================      # html / css の生成      ======================")
 
 with open(filename_html, "a") as f3:
