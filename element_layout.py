@@ -195,4 +195,11 @@ def layout_arrange(element_list):
         print("idx = " + str(element_json["block_num"]))
         print(block_layout)
 
+
+    if "[[[" in str(block_layout):
+        pass
+    else:
+        block_layout = [block_layout]
+
+
     return block_layout
