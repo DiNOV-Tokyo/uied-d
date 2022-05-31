@@ -1,6 +1,7 @@
 import os
 import cv2
 import json
+import shutil
 import sys
 import collections
 import pickle
@@ -14,7 +15,7 @@ filename = "br"
 filename = args[1]
 filename_img = "./data/input/" + filename + ".jpg"
 filename_json = "./data/output/merge/" + filename + ".json"
-filename_element_json = "./data/output/merge/" + filename + "_element.json"
+filename_element_json = "./data/output/merge/" + filename + "/" + filename + "_element.json"
 out_dir = "./data/output/merge/" + filename
 filename_html = out_dir + "/" + filename + ".html"
 filename_css = out_dir + "/" + filename + ".css"
@@ -419,68 +420,25 @@ with open(filename_element_json, mode='wt', encoding='utf-8') as fe:
     json.dump(element_list, fe, ensure_ascii=False, indent=2)
 
 
-block_layout = el.layout_arrange(element_list)
+#block_layout = el.layout_arrange2(element_list)
 
+block_layout = el.all_layout_reorder(element_list)
 
 print("=======================   Reordered Block List    ====================")
 print(block_layout)
+n=input()
 
 print("======================= 左上から右下へBlock番号の付け替え ========================")
-div_num = 0
-col_num = 0
-element_result = []
-cnt = 0
-print("len block = " + str(len(block_layout)))
-for k in block_layout:
-    print(k)
-    if isinstance(k, list):
-        print("List")
-        print(k)
-        for m in k:
-            if isinstance(m, list):
-                for n in m:
-                    element_json = json.loads(element_list[n])
-                    element_json["block_num"] = cnt
-                    element_json["div_num"] = div_num
-                    element_json["col_num"] = col_num
-                    element_result.append(element_json)
-                    cnt = cnt + 1
-#                col_num = col_num + 1
-                print("In deep col")
 
-            else:
-                element_json = json.loads(element_list[m])
-                element_json["block_num"] = cnt
-                element_json["div_num"] = div_num
-                element_json["col_num"] = col_num
-                element_result.append(element_json)
-                cnt = cnt + 1
-                print("In deep col 2")
-            col_num = col_num + 1
+element_result = el.layout_number(element_list, block_layout)
+#print(element_result)
 
-        print("div=" + str(div_num) + "  col=" + str(col_num))
-        print(k)
-    else:
-        print("Non-List")
-        print(k)
-        element_json = json.loads(element_list[k])
-        element_json["block_num"] = cnt
-        element_json["div_num"] = div_num
-        element_json["col_num"] = col_num
-        element_result.append(element_json)
-        cnt = cnt + 1
-
-        print("div=" + str(div_num) + "  col=" + str(col_num))
-        print(k)
-
-    div_num = div_num + 1
-    col_num = 0
-
+print("======================= ここまで、番号替え ========================")
 
 with open(filename_element_json, mode='wt', encoding='utf-8') as fe:
     json.dump(element_result, fe, ensure_ascii=False, indent=2)
 
-print(element_result)
+#print(element_result)
 print("=================      # html / css の生成      ======================")
 
 with open(filename_html, "a") as f3:
@@ -669,6 +627,11 @@ with open(filename_html, "a") as f3:
     f3.writelines(tb + '</main>\n')
     tb = tab_str(False)
     f3.writelines(tb + '</body>\n')
+
+
+#shutil.copy("./data/output/merge/" + filename + "_element.json", out_dir)
+shutil.copy("./data/output/merge/" + filename + ".jpg", out_dir)
+#shutil.copy(filename_json, out_dir)
 
 #print(element_list)
 #print("\n")
