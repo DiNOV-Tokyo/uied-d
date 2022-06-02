@@ -642,7 +642,9 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
             #if (block_comp_json["block_height_center"] < block_idx_json["block_bottom"]) and (block_comp_json["block_height_center"] > block_idx_json["block_top"]):
             #    in_same_row_flg = True
             in_same_row_flg = True
-            if (block_comp_json["block_bottom"] + 150 < block_idx_json["block_height_center"]) or (block_comp_json["block_top"] > 150 + block_idx_json["block_height_center"]):
+            diff_val = 80
+#            if (block_comp_json["block_bottom"] + 150 < block_idx_json["block_height_center"]) or (block_comp_json["block_top"] > 150 + block_idx_json["block_height_center"]):
+            if (block_comp_json["block_top"] - block_idx_json["block_bottom"]) > diff_val or (block_idx_json["block_top"] - block_comp_json["block_bottom"]) > diff_val :
                 in_same_row_flg = False
 
         else:
@@ -663,10 +665,12 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
                 is_forehead_flg = False
         
         # 同じcolumnに入っていなくて、先にある。
-        elif (block_comp_json["block_top"] > block_idx_json["block_bottom"]): 
+        elif (block_comp_json["block_top"] > block_idx_json["block_bottom"]) and (block_comp_json["block_right"] > block_idx_json["block_left"]): 
             is_forehead_flg = True
             print("ここか？　２")
-
+            print("comp = " + str(block_comp_json["block_num"]) + "   idx = " + str(block_idx_json["block_num"]))
+            print("top = " + str(block_comp_json["block_top"]) + "   Bottom = " + str(block_idx_json["block_bottom"]))
+            n = input()
         # 同じcolumnに入っていなくて、先にある。
         elif (block_comp_json["block_left"] > block_idx_json["block_right"]) and (block_comp_json["block_bottom"] > block_idx_json["block_bottom"]) :
             is_forehead_flg = True
@@ -689,7 +693,6 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
             break
 
         block_layout_col.append(i) 
- #       print("here")
 
         pre_is_forehead_flg = is_forehead_flg
 
@@ -698,24 +701,21 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
 
     # 全col要素を検査終わったときの処理
     # 同じrow,　同じcolにあり、
-#    print("no_cnt " + str(no_cnt))
-#    print("no_elemt " + str(no_elemt))
     if in_same_row_flg and in_same_col_flg and no_cnt == no_elemt and not is_in_block_flg:
         # block_layout の中をすべて検査し終わったとき
         if not is_forehead_flg:
             # 後にあり・・・
             block_layout_col.append(idx) 
             is_in_block_flg = True
-#            print("In 012")
         else:
             # 前にあり・・・
             block_layout_col.remove(i) 
             block_layout_col.append(idx) 
             block_layout_col.append(i) 
             is_in_block_flg = True
- #           print("In 234")
 
     print("return block_layout col = ")
     print(block_layout_col)
-    #n=input()
+    print("==========================")
+
     return is_in_block_flg, block_layout_col, in_same_row_flg, in_same_col_flg, is_forehead_flg
