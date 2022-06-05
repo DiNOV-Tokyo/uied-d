@@ -1,0 +1,15 @@
+*.jpg
+*.jpeg
+*.css
+*.html
+*.json
+*.png
+data/*
+lib/*
+lib64
+config/*
+*.pyc
+saved_model/*
+share/*
+saved_model_train/*
+bin/*

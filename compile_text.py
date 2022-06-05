@@ -12,7 +12,6 @@ import element_color as ec
 
 args = sys.argv
 # filename without extension
-filename = "br"
 filename = args[1]
 filename_img = "./data/input/" + filename + ".jpg"
 filename_json = "./data/output/merge/" + filename + ".json"
@@ -304,10 +303,8 @@ with open(filename_html, "a") as f3:
     f3.writelines(tb + '<div class="main-inner">\n')
 
 # 背景色を読み取る
-pos = (20, 20)
-img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
-color = list(img[pos])
-color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
+color_str = ec.back_color(filename_img)
+
 class_list = []
 class_str = ""
 
@@ -315,7 +312,7 @@ with open(filename_html, "w") as f3:
     f3.writelines('<!DOCTYPE html>\n')
     f3.writelines('<html lang="ja">\n')
     f3.writelines('<head><meta charset="utf-8">\n')
-    f3.writelines('<title>タイトル</title>\n')
+    f3.writelines('<title>' + filename + '</title>\n')
     f3.writelines('<link rel="stylesheet" href="' + filename + '.css">\n')
     f3.writelines('</head>\n')
     f3.writelines('<body>\n')
