@@ -670,7 +670,7 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
             print("ここか？　２")
             print("comp = " + str(block_comp_json["block_num"]) + "   idx = " + str(block_idx_json["block_num"]))
             print("top = " + str(block_comp_json["block_top"]) + "   Bottom = " + str(block_idx_json["block_bottom"]))
-            n = input()
+            #n = input()
         # 同じcolumnに入っていなくて、先にある。
         elif (block_comp_json["block_left"] > block_idx_json["block_right"]) and (block_comp_json["block_bottom"] > block_idx_json["block_bottom"]) :
             is_forehead_flg = True
