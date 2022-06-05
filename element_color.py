@@ -6,6 +6,14 @@ import sys
 import collections
 import pickle
 
+def back_color(filename_img):
+    # 背景色を読み取る
+    pos = (20, 20)
+    img = cv2.imread(filename_img, cv2.IMREAD_UNCHANGED)
+    color = list(img[pos])
+    color_str = "#" + format(color[2], 'x').zfill(2) + format(color[1], 'x').zfill(2) + format(color[0], 'x').zfill(2)
+
+    return color_str
 
 def area_color(filename_img, idx, jon_dat):
     # 色の抽出
