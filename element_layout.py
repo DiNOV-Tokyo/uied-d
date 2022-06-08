@@ -587,7 +587,7 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
 
         print("Row block の途中経過= ")
         print(block_layout_row)
-
+        #n = input()
 
     print("return block_layout row = ")
     print(block_layout_row)
@@ -636,7 +636,8 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
         # 以下の評価方法、評価基準は、要見直し！！！
 
         # 同じrowに入っているか？ この判断は難しい・・・・
-        if abs(block_comp_json["block_height_center"] - block_idx_json["block_height_center"]) < 200:
+#        if abs(block_comp_json["block_height_center"] - block_idx_json["block_height_center"]) < 200:
+        if (abs(block_comp_json["block_height_center"] - block_idx_json["block_height_center"]) < 200) or (abs(block_comp_json["block_top"] - block_idx_json["block_top"]) < 30) or (abs(block_comp_json["block_bottom"] - block_idx_json["block_bottom"]) < 30):
             #if (block_comp_json["block_bottom"] > block_idx_json["block_height_center"]) and (block_comp_json["block_top"] < block_idx_json["block_height_center"]):
             #    in_same_row_flg = True
             #if (block_comp_json["block_height_center"] < block_idx_json["block_bottom"]) and (block_comp_json["block_height_center"] > block_idx_json["block_top"]):
@@ -652,6 +653,7 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
 
         # 同じcolumnに入っているか？
         if abs(block_comp_json["block_left"] - block_idx_json["block_left"]) < 40:
+#        if (abs(block_comp_json["block_width_center"] - block_idx_json["block_width_center"]) < 120) or (abs(block_comp_json["block_left"] - block_idx_json["block_left"]) < 40):
             in_same_col_flg = True
 
             # 前後関係の検出

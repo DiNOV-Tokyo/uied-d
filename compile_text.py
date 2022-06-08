@@ -144,6 +144,7 @@ a = json.dumps(jon_dat)
 element_num = a.count('"id":')
 element_cnt = 0
 
+frame_width = jon_dat["img_shape"][0]
 
 next_div = False
 pre_row_min = 0
@@ -358,7 +359,7 @@ for j in range(element_num):
             f2.writelines("}\n")
             
             f2.writelines("main .div1 {\n")
-            f2.writelines("\t width: 1400px;\n")
+            f2.writelines("\t width: " + str(frame_width) + "px;\n")
             f2.writelines("\t margin: 0 auto;\n")
             f2.writelines("\t display: -webkit-box;\n")
             f2.writelines("\t display: -ms-flexbox;\n")
@@ -414,7 +415,7 @@ for j in range(element_num):
                     css_str = css_str + " ." + class_l
 
                 f2.writelines(css_str + " {\n")
-                f2.writelines("\t width: 1000px;\n")
+                f2.writelines("\t width: " + str(frame_width) + "px;\n")
                 f2.writelines("\t margin: 0 auto;\n")
                 f2.writelines("\t display: -webkit-box;\n")
                 f2.writelines("\t display: -ms-flexbox;\n")
@@ -461,11 +462,11 @@ for j in range(element_num):
 
             for k in element["block_list"]:
                 tb = tab_str(True)
-                f3.writelines(tb + '<div>\n')
+                f3.writelines(tb + '<p>\n')
                 tb = tab_str(True)
                 f3.writelines(tb + jon_dat["compos"][k]["text_content"] + '\n')
                 tb = tab_str(False)
-                f3.writelines(tb + '</div>\n')
+                f3.writelines(tb + '</p>\n')
 
             class_list.pop(-1)
             tb = tab_str(False)
