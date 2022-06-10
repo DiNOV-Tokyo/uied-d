@@ -5,6 +5,7 @@
 *.json
 *.png
 data/*
+data/output/*
 lib/*
 lib64
 config/*
