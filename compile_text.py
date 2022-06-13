@@ -16,6 +16,7 @@ filename = args[1]
 filename_img = "./data/input/" + filename + ".jpg"
 filename_json = "./data/output/merge/" + filename + ".json"
 filename_element_json = "./data/output/merge/" + filename + "/" + filename + "_element.json"
+filename_copy_img = "./data/output/merge/" + filename + "/" + filename + "_org.jpg"
 out_dir = "./data/output/merge/" + filename
 filename_html = out_dir + "/" + filename + ".html"
 filename_css = out_dir + "/" + filename + ".css"
@@ -32,7 +33,8 @@ if not os.path.exists(pic_dir):
     # ディレクトリが存在しない場合、ディレクトリを作成する
     os.makedirs(pic_dir)
 
-
+# 元画像ファイルをコピー
+shutil.copyfile(filename_img, filename_copy_img)
 
 # htmlファイルのタブ数のカウント
 tab_num = 0
@@ -364,6 +366,7 @@ for j in range(element_num):
             f2.writelines("\t display: -webkit-box;\n")
             f2.writelines("\t display: -ms-flexbox;\n")
             f2.writelines("\t display: flex;\n")
+            f2.writelines("\t justify-content: center;\n")
             f2.writelines("\t -webkit-box-align: center;\n")
             f2.writelines("\t -ms-flex-align: center;\n")
             f2.writelines("\t align-items: center;\n")
@@ -420,11 +423,12 @@ for j in range(element_num):
                 f2.writelines("\t display: -webkit-box;\n")
                 f2.writelines("\t display: -ms-flexbox;\n")
                 f2.writelines("\t display: flex;\n")
+                f2.writelines("\t justify-content: center;\n")
                 f2.writelines("\t -webkit-box-align: center;\n")
                 f2.writelines("\t -ms-flex-align: center;\n")
                 f2.writelines("\t align-items: center;\n")
                 f2.writelines("}\n")
-
+ 
 
         pre_div_num = element["div_num"]
 
@@ -442,6 +446,14 @@ for j in range(element_num):
             tb = tab_str(False)
             f3.writelines(tb + '</div>\n')
 
+        with open(filename_css, "a") as f2:
+            css_str = "main"
+            for class_l in class_list[1:]:
+                css_str = css_str + " ." + class_l
+            f2.writelines(css_str + "{\n")
+            f2.writelines("\t padding: 50px 40px 10px;\n")
+            f2.writelines("}\n")
+
     elif element["block_type"] == "Text":
         with open(filename_html, "a") as f3:
             class_str = "sentence-area" + str(cnt)
@@ -454,8 +466,9 @@ for j in range(element_num):
                 for class_l in class_list[1:]:
                     css_str = css_str + " ." + class_l
                 f2.writelines(css_str + "{\n")
-                f2.writelines("\t margin-top: " + str(element["padding"]) +  "px;\n")
+                #f2.writelines("\t margin-top: " + str(element["padding"]) +  "px;\n")
                 f2.writelines("\t width: 100%;\n")
+                f2.writelines("\t padding: 5px 5px;\n")
                 f2.writelines("\t color: " + element["color"] + ";\n")
                 f2.writelines("\t font-size: " + str(element["txt_size"]) + "px;\n")
                 f2.writelines("}\n")
