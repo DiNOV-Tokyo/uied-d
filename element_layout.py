@@ -505,6 +505,7 @@ def all_layout_reorder(element_list):
                     block_layout.insert(index0, block_layout_return)
                 else:
                     if not in_same_row_flg and is_forehead_flg:
+                        print("ここに入っている？")
                         if not is_in_block_flg:
                             index0 = block_layout.index(block_rows)
                             block_layout.remove(block_rows)
@@ -585,11 +586,12 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
                 block_layout_row.append(block_layout_return)
                 print("Row block のここです ５")
             elif not in_same_row_flg and is_forehead_flg:
+                print("Row block のここです ６")
                 block_layout_row.append(block_col)
                 break
             else:
                 block_layout_row.append(block_col)
-                print("Row block のここです ６")
+                print("Row block のここです ７")
 
 
         print("Row block の途中経過= ")
