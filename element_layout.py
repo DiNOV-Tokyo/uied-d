@@ -505,15 +505,23 @@ def all_layout_reorder(element_list):
                     block_layout.insert(index0, block_layout_return)
                 else:
                     if not in_same_row_flg and is_forehead_flg:
+                        print("[cnt_row / no_row] ; is_in_block_flg, in_same_row_flg, in_same_col_flg, is_forehead_flg  :  [" + str(cnt_row) + " / " + str(no_row) + "] ;    " + str(is_in_block_flg) + " : " + str(in_same_row_flg) + " : " + str(in_same_col_flg) + " : " + str(is_forehead_flg) )
+
                         print("ここに入っている？")
-                        if not is_in_block_flg:
-                            index0 = block_layout.index(block_rows)
+                        #n = input()
+                        if cnt_row != no_row:
+                            if not is_in_block_flg:
+                                index0 = block_layout.index(block_rows)
+                                block_layout.remove(block_rows)
+                                block_layout.insert(index0, [[idx]])
+                                is_in_block_flg = True
+                                block_layout.insert(index0+1, block_rows)
+                        else:
                             block_layout.remove(block_rows)
-                            block_layout.insert(index0, [[idx]])
-                            #block_layout.append([[idx]])
-                            is_in_block_flg = True
-                            block_layout.insert(index0+1, block_rows)
-#                        block_layout.append(block_rows)
+                            if not is_in_block_flg:
+                                block_layout.append([[idx]])
+                                is_in_block_flg = True
+                            block_layout.append(block_rows)
                     elif not in_same_row_flg and cnt_row == no_row:
                         #block_layout.append(block_layout_return)
                         if not is_in_block_flg:
@@ -586,9 +594,11 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
                 block_layout_row.append(block_layout_return)
                 print("Row block のここです ５")
             elif not in_same_row_flg and is_forehead_flg:
+                print("[cnt_col / no_col] ; is_in_block_flg, in_same_row_flg, in_same_col_flg, is_forehead_flg  :  [" + str(cnt_col) + " / " + str(no_col) + "] ;    " + str(is_in_block_flg) + " : " + str(in_same_row_flg) + " : " + str(in_same_col_flg) + " : " + str(is_forehead_flg) )
+
                 print("Row block のここです ６")
                 block_layout_row.append(block_col)
-                break
+                #break
             else:
                 block_layout_row.append(block_col)
                 print("Row block のここです ７")
