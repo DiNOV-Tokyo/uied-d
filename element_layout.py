@@ -541,7 +541,8 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
             block_layout_row.append(block_layout_return)
             print("Row block のここです １")
         elif block_layout_return != block_col and is_forehead_flg:
-            block_layout_row.remove(block_col)
+            if block_col in block_layout_row:
+                block_layout_row.remove(block_col)
             block_layout_row.append(block_layout_return)
             block_layout_row.append(block_col)
             print("Row block のここです ２")
