@@ -246,7 +246,6 @@ def layout_arrange2(element_list):
                     print("Show block")
                     print(block_num0)
                     print(type(block_num0))
-
                     # リストの中にリストがあるか？　あれば、もう一回リストに入って作業
                     if er.isNextList(block_num0):
                         # 入れ子リストのカウンター
@@ -346,26 +345,16 @@ def layout_arrange2(element_list):
                         not_in_list_flg = False
                         break
 
-    #            if next_loop_flg:
-    #3                next_loop_flg = False
-    #                break
-
-    #        print("block_layout")
-    #        if next_loop_flg:
-    #            next_loop_flg = False
-    #            break
 
             print("idx = " + str(idx) + "  not_in_list_flg = " + str(not_in_list_flg) + "   cnt_tmp = " + str(cnt_tmp) + "  cnt = " + str(cnt))
             # 同じrowでリストの最後につける
             if not_in_list_flg and cnt_tmp >= cnt and not er.isInList(block_layout, idx):
-    #        if not_in_list_flg and cnt_tmp == cnt:
                 print(block_layout)
 
                 # 同じrowにあるとき
                 if not not_in_same_row_flg:
                     print("[end] Same row")
-                    #cnt_tmp = cnt_tmp + 1
-                    #block_layout.append([idx])
+
                     if len(block_layout) == 1:
                         block_layout.append([idx])
                     else:
@@ -410,12 +399,11 @@ def layout_number(element_list, block_layout):
     col_num = 0
     element_result = []
     cnt = 0
-#    print("len block = " + str(len(block_layout)))
+
     for k in block_layout:
-#        print(k)
+
         if isinstance(k, list):
-#            print("List")
-#            print(k)
+
             for m in k:
                 if isinstance(m, list):
                     for n in m:
@@ -425,8 +413,6 @@ def layout_number(element_list, block_layout):
                         element_json["col_num"] = col_num
                         element_result.append(element_json)
                         cnt = cnt + 1
-    #                col_num = col_num + 1
- #                   print("In deep col")
 
                 else:
                     element_json = json.loads(element_list[m])
@@ -435,23 +421,16 @@ def layout_number(element_list, block_layout):
                     element_json["col_num"] = col_num
                     element_result.append(element_json)
                     cnt = cnt + 1
-#                    print("In deep col 2")
+
                 col_num = col_num + 1
 
-  #          print("div=" + str(div_num) + "  col=" + str(col_num))
-  #          print(k)
         else:
-   #         print("Non-List")
-   #         print(k)
             element_json = json.loads(element_list[k])
             element_json["block_num"] = cnt
             element_json["div_num"] = div_num
             element_json["col_num"] = col_num
             element_result.append(element_json)
             cnt = cnt + 1
-
- #           print("div=" + str(div_num) + "  col=" + str(col_num))
-  #          print(k)
 
         div_num = div_num + 1
         col_num = 0
@@ -487,7 +466,7 @@ def all_layout_reorder(element_list):
                 print("について、==========")
                 print("\t block_row idx= " + str(idx))
                 print("を調べます。============\n")
-                #n=input()
+
                 cnt_row = cnt_row + 1
 
                 is_in_block_flg, block_layout_return, in_same_row_flg, in_same_col_flg, is_forehead_flg = row_layout_reorder(idx, block_rows, element_list, is_in_block_flg)
@@ -508,7 +487,7 @@ def all_layout_reorder(element_list):
                         print("[cnt_row / no_row] ; is_in_block_flg, in_same_row_flg, in_same_col_flg, is_forehead_flg  :  [" + str(cnt_row) + " / " + str(no_row) + "] ;    " + str(is_in_block_flg) + " : " + str(in_same_row_flg) + " : " + str(in_same_col_flg) + " : " + str(is_forehead_flg) )
 
                         print("ここに入っている？")
-                        #n = input()
+
                         if cnt_row != no_row:
                             if not is_in_block_flg:
                                 index0 = block_layout.index(block_rows)
@@ -523,14 +502,13 @@ def all_layout_reorder(element_list):
                                 is_in_block_flg = True
                             block_layout.append(block_rows)
                     elif not in_same_row_flg and cnt_row == no_row:
-                        #block_layout.append(block_layout_return)
+
                         if not is_in_block_flg:
                             block_layout.append([[idx]])
                             is_in_block_flg = True
 
                 print("最終Blockの途中経過  block_row_layout end " + str(idx))
                 print(block_layout)
-                #n=input()
 
     return block_layout
 
@@ -542,7 +520,7 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
     cnt_col = 0
     no_col = len(block_rows)
     print(block_rows)
-    #n=input()
+
     # block_layout の cols を検討していく
     for block_col in block_rows:
         
@@ -563,7 +541,8 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
             block_layout_row.append(block_layout_return)
             print("Row block のここです １")
         elif block_layout_return != block_col and is_forehead_flg:
-            block_layout_row.remove(block_col)
+            if block_col in block_layout_row:
+                block_layout_row.remove(block_col)
             block_layout_row.append(block_layout_return)
             block_layout_row.append(block_col)
             print("Row block のここです ２")
@@ -581,12 +560,6 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
                 block_layout_row.append(block_layout_return)
                 print("Row block のここです ４")
 
-#            elif not in_same_row_flg and cnt_col == no_col and is_forehead_flg:
-#                print("ここです。")
-#                if not is_in_block_flg:
-#                    block_layout_row.append([idx])
-#                    is_in_block_flg = True
-#                block_layout_row.append(block_layout_return)
             elif in_same_row_flg and is_forehead_flg:
                 if not is_in_block_flg:
                     block_layout_row.append([idx])
@@ -606,11 +579,9 @@ def row_layout_reorder(idx, block_rows, element_list, is_in_block_flg):
 
         print("Row block の途中経過= ")
         print(block_layout_row)
-        #n = input()
 
     print("return block_layout row = ")
     print(block_layout_row)
-    #n=input()
 
     return is_in_block_flg, block_layout_row, in_same_row_flg, in_same_col_flg, is_forehead_flg
 
@@ -628,8 +599,6 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
 
     # 検討する要素を読み込む
     block_idx_json = json.loads(element_list[idx])
-
-  #  print("idx = " + str(idx))
 
     # 同じrowにあるかどうかのflg
     in_same_row_flg = False
@@ -655,15 +624,11 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
         # 以下の評価方法、評価基準は、要見直し！！！
 
         # 同じrowに入っているか？ この判断は難しい・・・・
-#        if abs(block_comp_json["block_height_center"] - block_idx_json["block_height_center"]) < 200:
         if (abs(block_comp_json["block_height_center"] - block_idx_json["block_height_center"]) < 200) or (abs(block_comp_json["block_top"] - block_idx_json["block_top"]) < 30) or (abs(block_comp_json["block_bottom"] - block_idx_json["block_bottom"]) < 30):
-            #if (block_comp_json["block_bottom"] > block_idx_json["block_height_center"]) and (block_comp_json["block_top"] < block_idx_json["block_height_center"]):
-            #    in_same_row_flg = True
-            #if (block_comp_json["block_height_center"] < block_idx_json["block_bottom"]) and (block_comp_json["block_height_center"] > block_idx_json["block_top"]):
-            #    in_same_row_flg = True
+
             in_same_row_flg = True
             diff_val = 80
-#            if (block_comp_json["block_bottom"] + 150 < block_idx_json["block_height_center"]) or (block_comp_json["block_top"] > 150 + block_idx_json["block_height_center"]):
+
             if (block_comp_json["block_top"] - block_idx_json["block_bottom"]) > diff_val or (block_idx_json["block_top"] - block_comp_json["block_bottom"]) > diff_val :
                 in_same_row_flg = False
 
@@ -672,7 +637,7 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
 
         # 同じcolumnに入っているか？
         if (abs(block_comp_json["block_left"] - block_idx_json["block_left"]) < 40) or (abs(block_comp_json["block_width_center"] - block_idx_json["block_width_center"]) < 120) :
-#        if (abs(block_comp_json["block_width_center"] - block_idx_json["block_width_center"]) < 120) or (abs(block_comp_json["block_left"] - block_idx_json["block_left"]) < 40):
+
             in_same_col_flg = True
 
             # 前後関係の検出
@@ -691,7 +656,7 @@ def col_layout_reorder(idx, block_col, element_list, is_in_block_flg):
             print("ここか？　２")
             print("comp = " + str(block_comp_json["block_num"]) + "   idx = " + str(block_idx_json["block_num"]))
             print("top = " + str(block_comp_json["block_top"]) + "   Bottom = " + str(block_idx_json["block_bottom"]))
-            #n = input()
+
         # 同じcolumnに入っていなくて、先にある。
         elif (block_comp_json["block_left"] > block_idx_json["block_right"]) and (block_comp_json["block_bottom"] > block_idx_json["block_bottom"]) :
             is_forehead_flg = True

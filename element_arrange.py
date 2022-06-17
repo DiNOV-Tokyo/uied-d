@@ -17,7 +17,7 @@ def arrange_json(filename_json):
         # 一旦、大きさが250以上の検出物のみをImageとする。
         # Image, Text のみをデータとして保存
         for k in range(element_num):
-            if int(jon_dat["compos"][k]["height"]) > 250 and int(jon_dat["compos"][k]["width"]) > 250:
+            if int(jon_dat["compos"][k]["height"]) > 140 and int(jon_dat["compos"][k]["width"]) > 140:
                 # もしchildrenがいたら、そのchildrenはImageとしない。
                 if "children" in jon_dat["compos"][k]:
                     for children_num in jon_dat["compos"][k]["children"]:

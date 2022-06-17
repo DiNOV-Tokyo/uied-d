@@ -4,46 +4,51 @@ body {
 	 background-color: #1e1e1e
 }
 main .div1 {
-	 width: 1400px;
+	 width: 919px;
 	 margin: 0 auto;
 	 display: -webkit-box;
 	 display: -ms-flexbox;
 	 display: flex;
+	 justify-content: center;
 	 -webkit-box-align: center;
 	 -ms-flex-align: center;
 	 align-items: center;
 }
+main .div1 .col1{
+	 padding: 50px 40px 10px;
+}
 main .div1 .col2 .sentence-area2{
-	 margin-top: 30px;
 	 width: 100%;
+	 padding: 5px 5px;
 	 color: white;
 	 font-size: 23px;
 }
 main .div1 .col2 .sentence-area3{
-	 margin-top: 30px;
 	 width: 100%;
+	 padding: 5px 5px;
 	 color: white;
 	 font-size: 16px;
 }
 main .div4 {
-	 width: 1000px;
+	 width: 919px;
 	 margin: 0 auto;
 	 display: -webkit-box;
 	 display: -ms-flexbox;
 	 display: flex;
+	 justify-content: center;
 	 -webkit-box-align: center;
 	 -ms-flex-align: center;
 	 align-items: center;
 }
 main .div4 .col4 .sentence-area4{
-	 margin-top: 30px;
 	 width: 100%;
+	 padding: 5px 5px;
 	 color: white;
 	 font-size: 15px;
 }
-main .div4 .col5 .sentence-area5{
-	 margin-top: 30px;
+main .div4 .col4 .sentence-area5{
 	 width: 100%;
+	 padding: 5px 5px;
 	 color: white;
 	 font-size: 12px;
 }
